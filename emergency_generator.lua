@@ -65,6 +65,7 @@ emergency_generator:power_data_register(
 emergency_generator:control_data_register(
   {
     ["punch_control"] = {
+        power_off_on_deactivate = true,
       },
   })
 
@@ -102,46 +103,17 @@ end
 -- Callbacks --
 ---------------
 
-local function update_generator_supply(self, pos, use_usage)
-  local side_data = {};
-  local total_demand = 0;
-  for _,side in pairs(self.power_connect_sides) do
-    local side_pos = appliances.get_side_pos(pos, side);
-    local side_node = minetest.get_node(side_pos);
-    local side_def = minetest.registered_nodes[side_node.name];
-    if side_def and side_def._generator_connect_sides then
-      if appliances.is_connected_to(side_pos, pos, side_def._generator_connect_sides) then
-        local meta = minetest.get_meta(side_pos);
-        local demand = meta:get_int("generator_demand") or 0
-        if (demand>0) then
-          total_demand = total_demand + demand;
-          table.insert(side_data, {meta=meta,demand=demand});
-        else
-          meta:set_int("generator_input", 0)
-        end
-      end
-    end
-  end
-  
-  if (total_demand>0) then
-    local generator_output = 0;
-    if use_usage then
-      generator_output = use_usage.generator_output or 150;
-    end
-    local part = generator_output/total_demand;
-    
-    for _,side in pairs(side_data) do
-      side.meta:set_int("generator_input", math.floor(side.demand*part))
-    end
-  end
-end
 
 function emergency_generator:cb_on_production(timer_step)
-  update_generator_supply(self, timer_step.pos, timer_step.use_usage)
+  power_generators.update_generator_supply(self, timer_step.pos, timer_step.use_usage)
+end
+
+function emergency_generator:cb_waiting(pos, meta)
+  power_generators.update_generator_supply(self, pos, nil)
 end
 
 function emergency_generator:cb_deactivate(pos, meta)
-  update_generator_supply(self, pos, nil)
+  power_generators.update_generator_supply(self, pos, nil)
 end
 
 ----------
@@ -162,7 +134,7 @@ end
 local node_def = {
     paramtype = "light",
     paramtype2 = "facedir",
-    groups = {cracky = 2},
+    groups = {cracky = 2, power_generator = 1},
     legacy_facedir_simple = true,
     is_ground_content = false,
     sounds = node_sounds,
@@ -212,7 +184,7 @@ local items = {
   phial_fuel = "biofuel:phial_fuel",
   phial_empty = "biofuel:phial",
   bottle_fuel = "biofuel:bottle_fuel",
-  bottle_empty = "vessles:glass_bottle",
+  bottle_empty = "vessels:glass_bottle",
   can_fuel = "biofuel:can_fuel",
   can_empty = "biofuel:can",
 }
@@ -221,7 +193,7 @@ if minetest.get_modpath("hades_biofuel") then
   items.phial_fuel = "hades_biofuel:phial_fuel"
   items.phial_empty = "hades_biofuel:phial"
   items.bottle_fuel = "hades_biofuel:bottle_fuel"
-  items.bottle_empty = "vessles:glass_bottle"
+  items.bottle_empty = "vessels:glass_bottle"
   items.can_fuel = "hades_biofuel:can_fuel"
   items.can_empty = "hades_biofuel:can"
 end

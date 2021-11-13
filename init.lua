@@ -13,6 +13,8 @@ appliances.register_craft_type("power_generators_fuel", {
     height = 1,
   })
 
+dofile(modpath.."/functions.lua")
+
 dofile(modpath.."/emergency_generator.lua")
 
 dofile(modpath.."/craftitems.lua")
