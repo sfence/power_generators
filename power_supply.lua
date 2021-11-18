@@ -4,13 +4,15 @@
 local power_supply = {
     is_powered = function (self, power_data, pos, meta)
         local eu_input = meta:get_int("generator_input");
-        if (eu_input>=power_data.demand) then
+        local demand = power_data.demand or power_data.get_demand(self, pos, meta)
+        if (eu_input>=demand) then
           return power_data.run_speed;
         end
         return 0;
       end,
     power_need = function (self, power_data, pos, meta)
-        meta:set_int("generator_demand", power_data.demand)
+        local demand = power_data.demand or power_data.get_demand(self, pos, meta)
+        meta:set_int("generator_demand", demand)
       end,
     power_idle = function (self, power_data, pos, meta)
         meta:set_int("generator_demand", 0)
