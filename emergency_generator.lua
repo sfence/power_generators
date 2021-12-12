@@ -6,6 +6,7 @@
 -- Initial Functions --
 -----------------------
 local S = power_generators.translator;
+local Cable = power_generators.electric_cable
 
 power_generators.emergency_generator = appliances.appliance:new(
     {
@@ -175,6 +176,11 @@ local node_active = {
   }
 
 emergency_generator:register_nodes(node_def, node_inactive, node_active)
+
+Cable:add_secondary_node_names({emergency_generator.node_name_active, emergency_generator.node_name_inactive})
+--Cable:add_special_node_names({name})
+Cable:set_valid_sides(emergency_generator.node_name_active, {"R", "L", "F", "B"})
+Cable:set_valid_sides(emergency_generator.node_name_inactive, {"R", "L", "F", "B"})
 
 -------------------------
 -- Recipe Registration --

@@ -1,6 +1,17 @@
 
 -- register power supply to power generators
 
+local Cable = power_generators.electric_cable
+
+local tubelib2_side = {
+    right = "R",
+    left = "L",
+    front = "F",
+    back = "B",
+    top = "U",
+    bottom = "D",
+  }
+
 local power_supply = {
     is_powered = function (self, power_data, pos, meta)
         local eu_input = meta:get_int("generator_input");
@@ -20,6 +31,21 @@ local power_supply = {
     update_node_def = function(self, power_data, node_def)
         node_def.groups.generator_powered = 1;
         node_def._generator_connect_sides = self.power_connect_sides;
+      end,
+    after_register_node = function(self, power_data)
+        local names = {self.node_name_active, self.node_name_inactive}
+        if self.node_name_waiting then
+          table.insert(names, self.node_name_waiting)
+        end
+        local sides = {}
+        for _,side in pairs(self.power_connect_sides) do
+          table.insert(sides, tubelib2_side[side])
+        end
+        for _,name in pairs(names) do
+          Cable:add_secondary_node_names({name})
+          --Cable:add_special_node_names({name})
+          Cable:set_valid_sides(name, sides)
+        end
       end,
   }
 appliances.add_power_supply("power_generators_power", power_supply)

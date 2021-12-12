@@ -50,6 +50,17 @@ if minetest.get_modpath("hades_technic") then
 end
 
 minetest.register_craft({
+    output = "power_generators:electric_cableS 6",
+    recipe = {
+      {"basic_materials:plastic_sheet", "", ""},
+      {"", "basic_materials:copper_wire", ""},
+      {"", "", "basic_materials:plastic_sheet"},
+    },
+    replacements = {{items.copper_wire,items.empty_spool}},
+  })
+
+
+minetest.register_craft({
     output = "power_generators:combustion_engine_piston",
     recipe = {
       {items.strong_ingot, items.strong_ingot, items.strong_ingot},
