@@ -17,6 +17,8 @@ local power_supply = {
         local eu_input = meta:get_int("generator_input");
         local demand = power_data.demand or power_data.get_demand(self, pos, meta)
         if (eu_input>=demand) then
+          -- prevent run, when connection lost
+          meta:set_int("generator_input", 0)
           return power_data.run_speed;
         end
         return 0;
@@ -31,6 +33,10 @@ local power_supply = {
     update_node_def = function(self, power_data, node_def)
         node_def.groups.generator_powered = 1;
         node_def._generator_connect_sides = self.power_connect_sides;
+        node_def._generator_powered_valid_sides = {}
+        for _,side in pairs(self.power_connect_sides) do
+          node_def._generator_powered_valid_sides[tubelib2_side[side]] = true
+        end
       end,
     after_register_node = function(self, power_data)
         local names = {self.node_name_active, self.node_name_inactive}
@@ -59,6 +65,7 @@ function power_generators.need_power(pos, gen_pos)
 end
 
 -- abm function
+--[[
 minetest.register_abm({
     label = "Check generator powered appliances",
     nodenames = {"group:generator_powered"},
@@ -77,4 +84,4 @@ minetest.register_abm({
       meta:set_int("generator_input", 0)
     end,
  })
-
+--]]

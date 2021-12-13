@@ -17,7 +17,13 @@ local function get_connected_node(pos, side)
   if not (epos and edir) then
     return nil
   end
-  return epos
+  local _,node = Cable:get_node(epos)
+  local out_side = tubelib2.dir_to_side(tubelib2.Turn180Deg[edir], node.param2)
+  local node_def = minetest.registered_nodes[node.name];
+  if node_def and node_def._generator_powered_valid_sides and node_def._generator_powered_valid_sides[out_side] then
+    return epos
+  end
+  return nil
 end
 
 function power_generators.update_generator_supply(self, pos, use_usage)
@@ -27,7 +33,6 @@ function power_generators.update_generator_supply(self, pos, use_usage)
     local side_pos = get_connected_node(pos, tubelib2_side[side])
     if side_pos then
       local side_node = minetest.get_node(side_pos);
-      print(dump(side_node))
       local side_def = minetest.registered_nodes[side_node.name];
       if side_def and side_def._generator_connect_sides then
         local meta = minetest.get_meta(side_pos);
