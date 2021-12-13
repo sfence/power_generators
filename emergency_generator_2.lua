@@ -10,10 +10,10 @@ local Cable = power_generators.electric_cable
 
 power_generators.emergency_generator = appliances.appliance:new(
     {
-      node_name_inactive = "power_generators:emergency_generator",
-      node_name_active = "power_generators:emergency_generator_active",
+      node_name_inactive = "power_generators:emergency_generator_2",
+      node_name_active = "power_generators:emergency_generator_2_active",
       
-      node_description = S("Emergency generator"),
+      node_description = S("Emergency Generator With Controller"),
     	node_help = S("Fill it with liquid fuel.").."\n"..S("Use this for generate energy.").."\n"..S("Startup and Shutdown by punch."),
       
       input_stack_size = 0,
@@ -218,25 +218,25 @@ emergency_generator:recipe_register_usage(
 		outputs = {items.phial_empty},
 		consumption_time = 2,
 		consumption_step_size = 1,
-    generator_output = 150,
+    generator_output = 200,
 	});
 emergency_generator:recipe_register_usage(
 	items.bottle_fuel,
 	{
 		inputs = 1,
 		outputs = {items.bottle_empty},
-		consumption_time = 20,
+		consumption_time = 22,
 		consumption_step_size = 1,
-    generator_output = 150,
+    generator_output = 200,
 	});
 emergency_generator:recipe_register_usage(
 	items.can_fuel,
 	{
 		inputs = 1,
 		outputs = {items.can_empty},
-		consumption_time = 160,
+		consumption_time = 176,
 		consumption_step_size = 1,
-    generator_output = 150,
+    generator_output = 200,
 	});
 
 emergency_generator:register_recipes("", "power_generators_fuel")

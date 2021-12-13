@@ -14,6 +14,8 @@ local items = {
   transforemr = "basic_materials:gold_wire",
   
   bar = "basic_materials:steel_bar",
+  
+  dye_yellow = "dye:yellow",
 }
 
 if minetest.get_modpath("hades_core") then
@@ -52,7 +54,7 @@ end
 minetest.register_craft({
     output = "power_generators:electric_cableS 6",
     recipe = {
-      {"basic_materials:plastic_sheet", "", ""},
+      {"basic_materials:plastic_sheet", items.dye_yellow, ""},
       {"", "basic_materials:copper_wire", ""},
       {"", "", "basic_materials:plastic_sheet"},
     },
@@ -100,6 +102,15 @@ minetest.register_craft({
     output = "power_generators:combustion_engine_body_2",
     recipe = {
       {"power_generators:combustion_engine_spark_plug", items.metal_ingot, "power_generators:combustion_engine_spark_plug"},
+      {"power_generators:combustion_engine_piston", "", "power_generators:combustion_engine_piston"},
+      {"power_generators:combustion_engine_cylinder_body", "power_generators:combustion_engine_crankshaft", "power_generators:combustion_engine_cylinder_body"},
+    }
+  })
+
+minetest.register_craft({
+    output = "power_generators:combustion_engine_body_2_controlled",
+    recipe = {
+      {"power_generators:combustion_engine_spark_plug", items.metal_ingot, "power_generators:combustion_engine_spark_plug"},
       {"power_generators:combustion_engine_piston", items.controller, "power_generators:combustion_engine_piston"},
       {"power_generators:combustion_engine_cylinder_body", "power_generators:combustion_engine_crankshaft", "power_generators:combustion_engine_cylinder_body"},
     }
@@ -127,6 +138,15 @@ minetest.register_craft({
 
 minetest.register_craft({
     output = "power_generators:combustion_engine_two_cylinders",
+    recipe = {
+      {items.metal_ingot, "", items.metal_ingot},
+      {items.copper_wire, "power_generators:combustion_engine_body_2", items.copper_wire},
+      {items.metal_ingot, items.bar, items.metal_ingot},
+    }
+  })
+
+minetest.register_craft({
+    output = "power_generators:combustion_engine_two_cylinders_controlled",
     recipe = {
       {items.metal_ingot, items.controller, items.metal_ingot},
       {items.copper_wire, "power_generators:combustion_engine_body_2", items.copper_wire},
@@ -171,3 +191,12 @@ minetest.register_craft({
     replacements = {{items.copper_wire,items.empty_spool}},
   })
 
+minetest.register_craft({
+    output = "power_generators:emergency_generator_2",
+    recipe = {
+      {items.metal_ingot, "power_generators:combustion_engine_fuel_tank", items.metal_ingot},
+      {"power_generators:combustion_engine_two_cylinders_controlled", "power_generators:combustion_engine_gearbox", "power_generators:combustion_engine_alternator"},
+      {items.metal_ingot, "", items.metal_ingot},
+    },
+    replacements = {{items.copper_wire,items.empty_spool}},
+  })

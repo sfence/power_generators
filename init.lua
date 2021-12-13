@@ -11,6 +11,7 @@ dofile(modpath.."/power_supply.lua")
 
 appliances.register_craft_type("power_generators_fuel", {
     description = "Generator fuel",
+    icon = "power_generators_fuel_recipe_icon.png",
     width = 1,
     height = 1,
   })
@@ -18,6 +19,7 @@ appliances.register_craft_type("power_generators_fuel", {
 dofile(modpath.."/functions.lua")
 
 dofile(modpath.."/emergency_generator.lua")
+dofile(modpath.."/emergency_generator_2.lua")
 
 dofile(modpath.."/craftitems.lua")
 dofile(modpath.."/crafting.lua")
