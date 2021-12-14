@@ -22,6 +22,10 @@ minetest.register_craftitem("power_generators:combustion_engine_spark_plug", {
   })
 
 minetest.register_craftitem("power_generators:combustion_engine_body_2", {
+    description = S("Combustion Engine Body 2 Without Controller"),
+    inventory_image = "power_generators_combustion_engine_body_2.png",
+  })
+minetest.register_craftitem("power_generators:combustion_engine_body_2_controlled", {
     description = S("Combustion Engine Body 2"),
     inventory_image = "power_generators_combustion_engine_body_2.png",
   })
@@ -37,6 +41,10 @@ minetest.register_craftitem("power_generators:combustion_engine_body_6", {
   })
 
 minetest.register_craftitem("power_generators:combustion_engine_two_cylinders", {
+    description = S("Combustion Engine Two Cylinders Without Controller"),
+    inventory_image = "power_generators_combustion_engine_two_cylinders.png",
+  })
+minetest.register_craftitem("power_generators:combustion_engine_two_cylinders_controlled", {
     description = S("Combustion Engine Two Cylinders"),
     inventory_image = "power_generators_combustion_engine_two_cylinders.png",
   })

@@ -106,15 +106,15 @@ end
 
 
 function emergency_generator:cb_on_production(timer_step)
-  power_generators.update_generator_supply(self, timer_step.pos, timer_step.use_usage)
+  power_generators.update_generator_supply(self.power_connect_sides, timer_step.pos, timer_step.use_usage)
 end
 
 function emergency_generator:cb_waiting(pos, meta)
-  power_generators.update_generator_supply(self, pos, nil)
+  power_generators.update_generator_supply(self.power_connect_sides, pos, nil)
 end
 
 function emergency_generator:cb_deactivate(pos, meta)
-  power_generators.update_generator_supply(self, pos, nil)
+  power_generators.update_generator_supply(self.power_connect_sides, pos, nil)
 end
 
 ----------

@@ -15,22 +15,22 @@ local function get_connected_node(pos, side)
   local dir = tubelib2.side_to_dir(side, node.param2)
   local epos, edir = Cable:get_connected_node_pos(pos, dir)
   if not (epos and edir) then
-    return nil
+    return nil, nil
   end
   local _,node = Cable:get_node(epos)
   local out_side = tubelib2.dir_to_side(tubelib2.Turn180Deg[edir], node.param2)
   local node_def = minetest.registered_nodes[node.name];
   if node_def and node_def._generator_powered_valid_sides and node_def._generator_powered_valid_sides[out_side] then
-    return epos
+    return epos, out_side
   end
-  return nil
+  return nil, nil
 end
 
-function power_generators.update_generator_supply(self, pos, use_usage)
+function power_generators.update_generator_supply(sides, pos, use_usage)
   local side_data = {};
   local total_demand = 0;
-  for _,side in pairs(self.power_connect_sides) do
-    local side_pos = get_connected_node(pos, tubelib2_side[side])
+  for _,side in pairs(sides) do
+    local side_pos, side_dir = get_connected_node(pos, tubelib2_side[side])
     if side_pos then
       local side_node = minetest.get_node(side_pos);
       local side_def = minetest.registered_nodes[side_node.name];
@@ -39,7 +39,11 @@ function power_generators.update_generator_supply(self, pos, use_usage)
         local demand = meta:get_int("generator_demand") or 0
         if (demand>0) then
           total_demand = total_demand + demand;
-          table.insert(side_data, {meta=meta,demand=demand});
+          table.insert(side_data, {
+            meta=meta,
+            demand=demand,
+            set_func=side_def.set_PG_power_input,
+            dir=side_dir});
         else
           meta:set_int("generator_input", 0)
         end
@@ -55,8 +59,14 @@ function power_generators.update_generator_supply(self, pos, use_usage)
     local part = generator_output/total_demand;
     
     for _,side in pairs(side_data) do
-      side.meta:set_int("generator_input", math.floor(side.demand*part))
+      if side.set_func then
+        side.set_func(side.meta, side.dir, math.floor(side.demand*part))
+      else
+        side.meta:set_int("generator_input", math.floor(side.demand*part))
+      end
     end
   end
+  
+  return total_demand
 end
 
