@@ -30,6 +30,17 @@ local function gen_on_blast(drop)
   end
 end
 
+local node_sounds = nil
+if minetest.get_modpath("default") then
+  node_sounds = default.node_sound_defaults();
+end
+if minetest.get_modpath("hades_sounds") then
+  node_sounds = hades_sounds.node_sound_defaults();
+end
+if minetest.get_modpath("sounds") then
+  node_sounds = sounds.node();
+end
+
 minetest.register_node("power_generators:electric_cableS", {
   description = S("PG Electric Cable"),
   tiles = {
@@ -53,7 +64,7 @@ minetest.register_node("power_generators:electric_cableS", {
   sunlight_propagates = true,
   is_ground_content = false,
   groups = {snappy = 2, choppy = 2, oddly_breakable_by_hand = 3, power_generator_cable = 1},
-  sounds = default.node_sound_defaults(),
+  sounds = node_sounds,
   
   after_place_node = function(pos, placer, itemstack, pointed_thing)
     if not Cable:after_place_tube(pos, placer, pointed_thing) then
@@ -95,7 +106,7 @@ minetest.register_node("power_generators:electric_cableA", {
   is_ground_content = false,
   groups = {snappy = 2, choppy = 2, oddly_breakable_by_hand = 3, 
       techage_trowel = 1, not_in_creative_inventory = 1},
-  sounds = default.node_sound_defaults(),
+  sounds = node_sounds,
   drop = "power_generators:electric_cableS",
   
   after_dig_node = function(pos, oldnode, oldmetadata, digger)

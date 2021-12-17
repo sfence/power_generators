@@ -24,6 +24,17 @@ local function gen_on_blast(drop)
   end
 end
 
+local node_sounds = nil
+if minetest.get_modpath("default") then
+  node_sounds = default.node_sound_metal_defaults()
+end
+if minetest.get_modpath("hades_sounds") then
+  node_sounds = hades_sounds.node_sound_metal_defaults()
+end
+if minetest.get_modpath("sounds") then
+  node_sounds = sounds.node_metal()
+end
+
 minetest.register_node("power_generators:junction_box", {
   description = S("PG Electric Junction Box"),
   tiles = {
@@ -34,7 +45,7 @@ minetest.register_node("power_generators:junction_box", {
   is_ground_content = false,
   groups = {snappy = 2, choppy = 2, oddly_breakable_by_hand = 3, 
       },
-  sounds = default.node_sound_defaults(),
+  sounds = node_sounds,
   
   _generator_connect_sides = appliances.all_sides,
   _generator_powered_valid_sides = {R = true, L = true, F = true, B = true, U = true, D = true},

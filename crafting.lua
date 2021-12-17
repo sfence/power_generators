@@ -6,13 +6,14 @@ local items = {
   mese_fragment = "default:mese_crystal_fragment",
   metal_block = "default:steelblock",
   
+  plastic_sheet = "basic_materials:plastic_sheet",
   copper_wire = "basic_materials:copper_wire",
   empty_spool = "basic_materials:empty_spool",
   controller = "basic_materials:ic",
   
   gear = "basic_materials:gear_steel",
   electric_motor = "basic_materials:motor",
-  transforemr = "basic_materials:gold_wire",
+  transformer = "basic_materials:gold_wire",
   
   bar = "basic_materials:steel_bar",
   
@@ -26,6 +27,7 @@ if minetest.get_modpath("hades_core") then
   items.mese_fragment = "hades_core:mese_crystal_fragment"
   items.metal_block = "hades_core:steelblock"
   
+  items.plastic_sheet = "hades_extramaterials:plastic_sheet"
   items.copper_wire = "hades_extramaterials:copper_wire"
   items.empty_spool = "hades_extramaterials:empty_spool"
   items.controller = "hades_extramaterials:ic"
@@ -58,18 +60,18 @@ end
 minetest.register_craft({
     output = "power_generators:electric_cableS 6",
     recipe = {
-      {"basic_materials:plastic_sheet", items.dye_yellow, ""},
-      {"", "basic_materials:copper_wire", ""},
-      {"", "", "basic_materials:plastic_sheet"},
+      {items.plastic_sheet, items.dye_yellow, ""},
+      {"", items.copper_wire, ""},
+      {"", "", items.plastic_sheet},
     },
-    replacements = {{items.copper_wire,items.empty_spool}},
+    replacements = {{items.copper_wire, items.empty_spool}},
   })
 
 minetest.register_craft({
     output = "power_generators:junction_box",
     recipe = {
       {"power_generators:electric_cableS", "power_generators:electric_cableS", "power_generators:electric_cableS"},
-      {"basic_materials:plastic_sheet", items.metal_block, "basic_materials:plastic_sheet"},
+      {items.plastic_sheet, items.metal_block, items.plastic_sheet},
       {items.transformer, items.transformer, items.transformer},
     },
     replacements = {{items.copper_wire,items.empty_spool}},
