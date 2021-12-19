@@ -63,7 +63,7 @@ minetest.register_node("power_generators:junction_box", {
   on_blast = gen_on_blast("power_generators:junction_box"),
   
   on_construct = function(pos)
-    minetest.get_node_time(pos):start(1)
+    minetest.get_node_timer(pos):start(1)
   end,
   on_timer = function(pos, elapsed)
     local meta = minetest.get_meta(pos)

@@ -14,7 +14,7 @@ power_generators.emergency_generator = appliances.appliance:new(
       node_name_active = "power_generators:emergency_generator_active",
       
       node_description = S("Emergency generator"),
-    	node_help = S("Fill it with liquid fuel.").."\n"..S("Use this for generate energy.").."\n"..S("Startup and Shutdown by punch."),
+    	node_help = S("Fill it with liquid fuel.").."\n"..S("Use this for generate 150 unit of energy.").."\n"..S("Startup and Shutdown by punch."),
       
       input_stack_size = 0,
       have_input = false,
@@ -74,6 +74,11 @@ emergency_generator:control_data_register(
 -- Formspec --
 --------------
 
+local player_inv = "list[current_player;main;1.5,3.5;8,4;]";
+if minetest.get_modpath("hades_core") then
+   player_inv = "list[current_player;main;0.5,3.5;10,4;]";
+end
+
 function emergency_generator:get_formspec(meta, production_percent, consumption_percent)
   local progress = "";
   
@@ -89,7 +94,7 @@ function emergency_generator:get_formspec(meta, production_percent, consumption_
   local formspec =  "formspec_version[3]" .. "size[12.75,8.5]" ..
                     "background[-1.25,-1.25;15,10;appliances_appliance_formspec.png]" ..
                     progress..
-                    "list[current_player;main;1.5,3;8,4;]" ..
+                    player_inv ..
                     "list[context;"..self.use_stack..";2,0.8;1,1;]"..
                     "list[context;"..self.output_stack..";9.75,0.25;2,2;]" ..
                     "listring[current_player;main]" ..
