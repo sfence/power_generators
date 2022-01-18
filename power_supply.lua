@@ -74,7 +74,7 @@ minetest.register_abm({
     action = function(pos, node)
       local node_def = minetest.registered_nodes[node.name]
       for _,side in pairs(node_def._generator_connect_sides) do
-        local side_pos = appliances.get_side_pos(pos, side);
+        local side_pos = appliances.get_side_pos(pos, node, side);
         local side_node = minetest.get_node(side_pos);
         if minetest.get_item_group(side_node.name, "power_generator")>0 then
           return
