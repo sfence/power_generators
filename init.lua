@@ -5,22 +5,19 @@ power_generators = {
 
 local modpath = minetest.get_modpath(minetest.get_current_modname())
 
-dofile(modpath.."/electric_network.lua")
-dofile(modpath.."/power_supply.lua")
-dofile(modpath.."/electric_junction.lua")
-
 appliances.register_craft_type("power_generators_fuel", {
-    description = "Generator fuel",
+    description = "Combustion engine fuel",
     icon = "power_generators_fuel_recipe_icon.png",
     width = 1,
     height = 1,
   })
 
-dofile(modpath.."/functions.lua")
+dofile(modpath.."/electric/init.lua")
+dofile(modpath.."/shaft/init.lua")
+dofile(modpath.."/generators/init.lua")
+dofile(modpath.."/combustion_engine/init.lua")
 
-dofile(modpath.."/emergency_generator.lua")
-dofile(modpath.."/emergency_generator_2.lua")
-
+dofile(modpath.."/nodes.lua")
 dofile(modpath.."/craftitems.lua")
 dofile(modpath.."/crafting.lua")
 

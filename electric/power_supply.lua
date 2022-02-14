@@ -54,7 +54,7 @@ local power_supply = {
         end
       end,
   }
-appliances.add_power_supply("power_generators_power", power_supply)
+appliances.add_power_supply("power_generators_electric_power", power_supply)
 
 function power_generators.need_power(pos, gen_pos)
   local node = minetest.get_node(pos);

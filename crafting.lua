@@ -215,3 +215,4 @@ minetest.register_craft({
     },
     replacements = {{items.copper_wire,items.empty_spool}},
   })
+
