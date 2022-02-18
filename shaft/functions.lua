@@ -24,6 +24,9 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
   if rpm==0 then
     --local node = minetest.get_node(pos)
     --print("rpm 0 Isum: "..Isum.." L: "..L.." node: "..node.name)
+    if self._rpm_deactivate then
+      self:deactivate(pos, meta)
+    end
     return
   end
   
@@ -34,6 +37,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
   local minT = 0
   
   local Isum = I
+  local Fsum = 0
   --local Tpwr = 0
   local rpmPwr = 0
   local rpmPwrSum = 0
@@ -45,6 +49,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
     local ratio = meta:get_float(side.."_ratio")
     local TPart = meta:get_float(side.."_Tpart")
     local s_I = 0
+    local s_F = 0
     --print("side "..side.." node: "..dump(side_node))
     while ratio>0 do
       local shaft = minetest.get_item_group(side_node.name, "shaft")
@@ -63,6 +68,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
           break
         end
         local o_I = side_meta:get_int("Isum")
+        local o_F = side_meta:get_int("fric")
         --local o_T = side_meta:get_int("T")
         local o_rpm = side_meta:get_int("L")/o_I
         ratio = ratio/o_ratio
@@ -71,6 +77,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
         
         table.insert(shafts, {
           meta = side_meta,
+          timer = minetest.get_node_timer(side_pos),
           ratio = ratio,
           I = o_I,
           --T = o_T,
@@ -86,6 +93,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
           --print(string.format("Usum + s_I + o_I*ratio = %d + %d +%d*%f", Isum, s_I, o_I, ratio))
           Isum = Isum + s_I + o_I*ratio
           minT = minT + side_meta:get_int("minT")*ratio*TPart
+          Fsum = Fsum + s_F + o_F*ratio*TPart
         else
           --Tpwr = Tpwr + o_T*ratio
           if rpmPwr>0 then
@@ -98,6 +106,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
         break
       else
         s_I = s_I + side_meta:get_int("I")*ratio
+        s_F = s_F + side_meta:get_float("fric")*ratio
       end
       
       from_pos = side_pos
@@ -107,9 +116,10 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
   end
   
   -- losts
-  local friction = self._friction
+  print(node.name)
+  local friction = self._friction + Fsum
   if not friction then
-    friction = meta:get_float("friction")
+    friction = meta:get_float("fric")
   end
   if use_usage then
     friction = friction*use_usage.friction
@@ -118,17 +128,18 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
   local agrease = meta:get_float("agrease")
   if agrease>0 then
     friction = friction*qgrease
-    agrease = agrease - (rpm*friction*0.000001) -- about 1000 s at 1000 rpm friction 1 and 1 amount
+    agrease = agrease - (rpm*friction*0.0000001) -- about 10000 s at 1000 rpm friction 1 and 1 amount
     meta:set_float("agrease", math.max(agrease, 0))
+    qgrease = self._qgrease_max - self._qgrease_eff*qgrease
   else
-    qgrease = 1
+    qgrease = self._qgrease_max
   end
   -- min on 480 rpm 1300 friction, at 0 rpm 2000 friction
-  friction = friction*(rpm+qgrease*2000000/(3*rpm+1000))
+  friction = friction*(qgrease*rpm+2000000/(3*rpm+1000))
   minT = minT + friction
   --E = math.max(E - friction*(rpm+1000), 0)
-  --print("rpmPwr: "..rpmPwr.." Isum: "..Isum.." friction: "..friction.." minT: "..minT)
-  --print("shafts: "..dump(shafts))
+  print("rpmPwr: "..rpmPwr.." Isum: "..Isum.." friction: "..friction.." minT: "..minT)
+  print("shafts: "..dump(shafts))
   
   -- recalculate
   if rpmPwr>0 then
@@ -151,7 +162,12 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
       shaft.meta:set_float(shaft.side_side.."_Tpart", shaft.rpm/shaft.ratio/rpmPwrSum)
       --print("Tpart: "..(shaft.rpm/shaft.ratio/rpmPwrSum))
     end
-    --print("rpm: "..new_rpm)
+    if new_rpm>0 then
+      if (not shaft.timer:is_started()) then
+        shaft.timer:start(1)
+      end
+    end
+    print("rpm: "..new_rpm)
   end
   meta:set_int("L", math.floor(rpm*Isum))
   
@@ -162,7 +178,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
     meta:set_int("minT", math.ceil(friction))
     meta:set_int("Isum", math.ceil(I))
   end
-  --print("rpm: "..rpm)
+  print("rpm: "..rpm)
 end
 
 function power_generators.update_shaft_supply(self, pos, meta, speed)
@@ -173,7 +189,7 @@ function power_generators.update_shaft_supply(self, pos, meta, speed)
   
   rpm = math.max(rpm + T/I, 0)
   -- minT is used in step function
-  --print("T: "..T.." I: "..I.." rpm: "..rpm)
+  print("T: "..T.." I: "..I.." rpm: "..rpm)
   
   meta:set_int("L", math.ceil(rpm*I))
   if rpm>0 then
@@ -197,3 +213,28 @@ function power_generators.ee_get_torque(self, pos, meta, rpm, I, speed)
   return T
 end
 
+function power_generators.apply_grease(itemstack, user, pointed_thing)
+  if pointed_thing.type=="node" then
+    local pos = pointed_thing.under
+    local node = minetest.get_node(pos)
+    if minetest.get_item_group(node.name, "greasable")>0 then
+      local meta = minetest.get_meta(pos)
+      local idef = itemstack:get_definition()
+      local agrease = meta:get_float("agrease")
+      if agrease<idef._agrease then
+        local qgrease = meta:get_float("qgrease")
+        
+        qgrease = qgrease*agrease + idef._qgrease*idef._agrease
+        agrease = agrease + idef._agrease
+        
+        meta:set_float("agrease", agrease)
+        meta:set_float("qgrease", qgrease/agrease)
+        
+        itemstack:take_item()
+        return itemstack
+      end
+      
+    end
+    return minetest.node_punch(pos, node, user, pointed_thing)
+  end
+end

@@ -27,11 +27,11 @@ power_generators.starter_manual = appliances.appliance:new(
       
       _shaft_sides = _shaft_sides,
       _friction = 0.5,
-      _I = 10000,
+      _I = 1000,
       -- F of human etc 400 N, 250W
       -- 250 W = F*draha*1
-      _maxT = 250*50,
-      _coef = 1*50,
+      _maxT = 250*5,
+      _coef = 1*5,
       
       sounds = {
         active_running = {

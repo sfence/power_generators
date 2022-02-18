@@ -17,6 +17,8 @@ dofile(modpath.."/rpm_meter_watt.lua")
 dofile(modpath.."/electric_engine.lua")
 dofile(modpath.."/rpm_meter.lua")
 
+dofile(modpath.."/greases.lua")
+
 dofile(modpath.."/adaptation.lua")
 
 dofile(modpath.."/craftitems.lua")

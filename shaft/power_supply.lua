@@ -28,8 +28,17 @@ local power_supply = {
         node_def.groups.shaft = 1;
         node_def._shaft_sides = self.power_connect_sides;
         self._shaft_sides = self.power_connect_sides
+        node_def._friction = power_data.friction
+        self._friction = power_data.friction
         node_def._I = power_data.I
         self._I = power_data.I
+        
+        self._rpm_deactivate = power_data.rpm_deactivate
+        self._qgrease_max = power_data.qgrease_max
+        self._qgrease_eff = power_data.qgrease_eff
+        if power_data.qgrease_eff>0 then
+          node_def.groups.greasable = 1
+        end
       end,
     on_construct = function(self, power_data, pos, meta)
         meta:set_int("I", power_data.I)

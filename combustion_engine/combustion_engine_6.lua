@@ -34,8 +34,8 @@ power_generators.combustion_engine_6c = appliances.appliance:new(
       have_control = true,
       
       _shaft_sides = _shaft_sides,
-      _friction = 2,
-      _I = 1500,
+      _friction = 20,
+      _I = 150,
       -- maxP per step is (maxT/I)*I
       _coef0 = -1768.3608,
       _coef1 = 35.4931,

@@ -31,8 +31,8 @@ power_generators.ce_gearbox = appliances.appliance:new(
       _shaft_side = "front",
       _starter_side = "top",
       _engine_side = "back",
-      _friction = 1,
-      _I = 900,
+      _friction = 10,
+      _I = 90,
       
       sounds = {
         running = {

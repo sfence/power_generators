@@ -1,12 +1,15 @@
 
 local items = {
+  iron_ingot = "default:steel_ingot",
   strong_ingot = "default:steel_ingot",
   metal_ingot = "default:steel_ingot",
   copper_ingot = "default:copper_ingot",
   mese_fragment = "default:mese_crystal_fragment",
   metal_block = "default:steelblock",
+  string = "farming:string",
   
   plastic_sheet = "basic_materials:plastic_sheet",
+  plastic_strip = "basic_materials:plastic_strip",
   copper_wire = "basic_materials:copper_wire",
   empty_spool = "basic_materials:empty_spool",
   controller = "basic_materials:ic",
@@ -15,19 +18,23 @@ local items = {
   electric_motor = "basic_materials:motor",
   transformer = "basic_materials:gold_wire",
   
-  bar = "basic_materials:steel_bar",
+  magnet = "default:mese_crystal_fragment",
+  glow_crystal = "default:mese_crystal_fragment",
   
   dye_yellow = "dye:yellow",
 }
 
 if minetest.get_modpath("hades_core") then
+  items.iron_ingot = "hades_core:steel_ingot"
   items.strong_ingot = "hades_core:steel_ingot"
   items.metal_ingot = "hades_core:steel_ingot"
   items.copper_ingot = "hades_core:copper_ingot"
   items.mese_fragment = "hades_core:mese_crystal_fragment"
   items.metal_block = "hades_core:steelblock"
+  items.string = "hades_farming:cotton"
   
   items.plastic_sheet = "hades_extramaterials:plastic_sheet"
+  items.plastic_strip = "hades_extramaterials:plastic_strip"
   items.copper_wire = "hades_extramaterials:copper_wire"
   items.empty_spool = "hades_extramaterials:empty_spool"
   items.controller = "hades_extramaterials:ic"
@@ -36,7 +43,8 @@ if minetest.get_modpath("hades_core") then
   items.electric_motor = "hades_extramaterials:motor"
   items.transformer = "hades_extramaterials:gold_wire"
   
-  items.bar = "hades_extramaterials:steel_bar"
+  items.magnet = "hades_core:mese_crystal_fragment"
+  items.glow_crystal = "glowcrystals:glowcrystal"
 end
 
 if minetest.get_modpath("technic") then
@@ -156,7 +164,7 @@ minetest.register_craft({
     recipe = {
       {items.metal_ingot, "", items.metal_ingot},
       {items.copper_wire, "power_generators:combustion_engine_body_2", items.copper_wire},
-      {items.metal_ingot, items.bar, items.metal_ingot},
+      {items.metal_ingot, "power_generators:shaft", items.metal_ingot},
     }
   })
 
@@ -165,7 +173,7 @@ minetest.register_craft({
     recipe = {
       {items.metal_ingot, items.controller, items.metal_ingot},
       {items.copper_wire, "power_generators:combustion_engine_body_2_controlled", items.copper_wire},
-      {items.metal_ingot, items.bar, items.metal_ingot},
+      {items.metal_ingot, "power_generators:shaft", items.metal_ingot},
     }
   })
 
@@ -203,7 +211,6 @@ minetest.register_craft({
       {"power_generators:combustion_engine_two_cylinders", "power_generators:combustion_engine_gearbox", "power_generators:combustion_engine_alternator"},
       {items.metal_ingot, "", items.metal_ingot},
     },
-    replacements = {{items.copper_wire,items.empty_spool}},
   })
 
 minetest.register_craft({
@@ -213,6 +220,162 @@ minetest.register_craft({
       {"power_generators:combustion_engine_two_cylinders_controlled", "power_generators:combustion_engine_gearbox", "power_generators:combustion_engine_alternator"},
       {items.metal_ingot, "", items.metal_ingot},
     },
-    replacements = {{items.copper_wire,items.empty_spool}},
+  })
+
+minetest.register_craft({
+    output = "power_generators:shaft 3",
+    recipe = {
+      {items.strong_ingot,},
+      {items.strong_ingot,},
+      {items.strong_ingot,},
+    }
+  })
+
+if minetest.get_modpath("technic") or minetest.get_modpath("hades_technic") then
+  minetest.register_craft({
+      output = "power_generators:carbon_steel_bar 6",
+      recipe = {
+        {"","",items.metal_ingot},
+        {"",items.metal_ingot,""},
+        {items.metal_ingot,"",""},
+      }
+    })
+end
+
+minetest.register_craft({
+    output = "power_generators:framework_base",
+    recipe = {
+      {"","power_generators:carbon_steel_bar",""},
+      {"power_generators:carbon_steel_bar","", "power_generators:carbon_steel_bar"},
+      {"","power_generators:carbon_steel_bar",""},
+    }
+  })
+
+minetest.register_craft({
+    type = "shapeless",
+    output = "power_generators:framework",
+    recipe = {
+      "power_generators:carbon_steel_bar",
+      "power_generators:carbon_steel_bar",
+      "power_generators:carbon_steel_bar",
+      "power_generators:carbon_steel_bar",
+      "power_generators:framework_base",
+      "power_generators:framework_base",
+    }
+  })
+
+minetest.register_craft({
+    output = "power_generators:block_of_3coils",
+    recipe = {
+      {items.copper_wire,items.copper_wire,items.copper_wire},
+      {items.plastic_strip,items.plastic_strip,items.plastic_strip},
+    },
+    replacements = {
+      {items.copper_wire,items.empty_spool},
+      {items.copper_wire,items.empty_spool},
+      {items.copper_wire,items.empty_spool}},
+  })
+
+minetest.register_craft({
+    output = "power_generators:block_of_3magnets",
+    recipe = {
+      {items.magnet,items.magnet,items.magnet},
+      {items.plastic_strip,items.plastic_strip,items.plastic_strip},
+    },
+  })
+
+minetest.register_craft({
+    output = "power_generators:electric_engine_p6",
+    recipe = {
+      {"","power_generators:block_of_3coils",""},
+      {"power_generators:block_of_3magnets","power_generators:shaft", "power_generators:block_of_3magnets"},
+      {"","power_generators:block_of_3coils",""},
+    }
+  })
+
+minetest.register_craft({
+    output = "power_generators:electric_engine_200",
+    recipe = {
+      {"power_generators:framework",items.iron_ingot,"power_generators:electric_cableS"},
+      {items.iron_ingot,"power_generators:electric_engine_p6",items.iron_ingot},
+      {"",items.iron_ingot,""},
+    }
+  })
+
+minetest.register_craft({
+    output = "power_generators:shaft_hor",
+    recipe = {
+      {"power_generators:framework","power_generators:shaft"},
+    }
+  })
+minetest.register_craft({
+    output = "power_generators:shaft_ver",
+    recipe = {
+      {"power_generators:shaft"},
+      {"power_generators:framework",}
+    }
+  })
+
+minetest.register_craft({
+    output = "power_generators:shaft_horLeft",
+    recipe = {
+      {"power_generators:framework",items.iron_ingot,"power_generators:shaft"},
+      {items.iron_ingot,"power_generators:shaft",items.iron_ingot},
+      {items.gear,items.iron_ingot,items.gear},
+    }
+  })
+
+minetest.register_craft({
+    output = "power_generators:shaft_horTop",
+    recipe = {
+      {"power_generators:framework",items.iron_ingot,items.gear},
+      {items.iron_ingot,"power_generators:shaft",items.iron_ingot},
+      {items.gear,items.iron_ingot,"power_generators:shaft"},
+    }
+  })
+
+minetest.register_craft({
+    output = "power_generators:shaft_verFront",
+    recipe = {
+      {items.gear,items.iron_ingot,"power_generators:shaft"},
+      {items.iron_ingot,"power_generators:shaft",items.iron_ingot},
+      {"power_generators:framework",items.iron_ingot,items.gear},
+    }
+  })
+
+minetest.register_craft({
+    output = "power_generators:shaft_switch",
+    recipe = {
+      {"power_generators:framework",items.iron_ingot,"power_generators:carbon_steel_bar"},
+      {items.iron_ingot,"power_generators:shaft",items.iron_ingot},
+      {items.gear,items.iron_ingot,items.gear},
+    }
+  })
+
+minetest.register_craft({
+    output = "power_generators:shaft_gearbox",
+    recipe = {
+      {"power_generators:framework",items.iron_ingot,items.gear},
+      {items.iron_ingot,"power_generators:shaft",items.iron_ingot},
+      {items.gear,items.iron_ingot,items.gear},
+    }
+  })
+
+minetest.register_craft({
+    output = "power_generators:rpm_meter",
+    recipe = {
+      {"power_generators:framework",items.controller,"power_generators:electric_cableS"},
+      {items.glow_crystal,"",items.mese_fragment},
+      {items.iron_ingot,"power_generators:shaft",items.iron_ingot},
+    }
+  })
+
+minetest.register_craft({
+    output = "power_generators:rpm_meter_watt",
+    recipe = {
+      {"power_generators:carbon_steel_bar","","power_generators:carbon_steel_bar"},
+      {items.string,"power_generators:shaft",items.plastic_sheet},
+      {"power_generators:carbon_steel_bar","","power_generators:carbon_steel_bar"},
+    }
   })
 
