@@ -15,7 +15,7 @@ power_generators.rpm_meter_watt = appliances.appliance:new(
       node_name_active = "power_generators:rpm_meter_watt_active",
       
       node_description = S("Shaft Watt RPM Meter"),
-    	node_help = S("Connect to shaft."),
+    	node_help = S("Can be greased."),
       
       input_stack_size = 0,
       have_input = false,

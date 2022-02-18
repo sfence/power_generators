@@ -15,7 +15,7 @@ power_generators.shaft_gearbox = appliances.appliance:new(
       node_name_active = "power_generators:shaft_gearbox_active",
       
       node_description = S("Shaft Gearbox"),
-    	node_help = S("Connect to power (@1).", "25 EU").."\n"..S("Use this for generate 150 unit of energy.").."\n"..S("Startup and Shutdown by punch."),
+    	node_help = S("Can be greased.").."\n"..S("Put/take gears to set gear ratio."),
       
       input_stack_size = 2,
       have_input = false,

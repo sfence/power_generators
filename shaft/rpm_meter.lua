@@ -15,7 +15,7 @@ power_generators.rpm_meter = appliances.appliance:new(
       node_name_active = "power_generators:rpm_meter_active",
       
       node_description = S("Shaft RPM Meter"),
-    	node_help = S("Connect to power (@1).", "25 EU").."\n"..S("Use this for generate 150 unit of energy.").."\n"..S("Startup and Shutdown by punch."),
+    	node_help = S("Connect to power (@1).", "25 EU").."\n"..S("Can be greased."),
       
       input_stack_size = 0,
       have_input = false,

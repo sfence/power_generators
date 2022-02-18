@@ -17,6 +17,7 @@ if minetest.get_modpath("farming") then
         _qgrease = 0.5,
         on_use = power_generators.apply_grease,
       })
+    appliances.add_item_help("farming:hemp_oil", "Can be used as grease.")
   end
 end
 
@@ -26,4 +27,6 @@ if minetest.get_modpath("hades_extrafarming") then
       _qgrease = 0.5,
       on_use = power_generators.apply_grease,
     })
+  appliances.add_item_help("hades_extrafarming:hemp_oil", "Can be used as grease.")
 end
+
