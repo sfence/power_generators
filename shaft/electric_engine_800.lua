@@ -10,13 +10,13 @@ local S = power_generators.translator;
 
 local _shaft_sides = {"front"}
 
-power_generators.electric_engine_200 = appliances.appliance:new(
+power_generators.electric_engine_800 = appliances.appliance:new(
     {
-      node_name_inactive = "power_generators:electric_engine_200",
-      node_name_active = "power_generators:electric_engine_200_active",
+      node_name_inactive = "power_generators:electric_engine_800",
+      node_name_active = "power_generators:electric_engine_800_active",
       
       node_description = S("Electric engine"),
-    	node_help = S("Connect to power (@1).","200 EU").."\n"..S("Use this for generata shaft torque.").."\n"..S("Startup and Shutdown by punch.").."\n"..S("Can be greased."),
+    	node_help = S("Connect to power (@1).","800 EU").."\n"..S("Use this for generata shaft torque.").."\n"..S("Startup and Shutdown by punch.").."\n"..S("Can be greased."),
       
       input_stack_size = 0,
       have_input = false,
@@ -26,10 +26,10 @@ power_generators.electric_engine_200 = appliances.appliance:new(
       power_connect_sides = {"back","right","left"},
       _shaft_sides = _shaft_sides,
       _friction = 10,
-      _maxT = 20000,
+      _maxT = 80000,
       -- maxP per step is (maxT/I)*I
-      _maxP = 20000*2000,
-      _limitRpm = 3000,
+      _maxP = 80000*500,
+      _limitRpm = 300,
       _I = 20,
       
       _qgrease_max = 2,
@@ -39,39 +39,39 @@ power_generators.electric_engine_200 = appliances.appliance:new(
       
       sounds = {
         active_running = {
-          sound = "power_generators_electric_engine_200_running",
+          sound = "power_generators_electric_engine_800_running",
           sound_param = {max_hear_distance = 16, gain = 1},
           repeat_timer = 3,
         },
         waiting_running = {
-          sound = "power_generators_electric_engine_200_running",
+          sound = "power_generators_electric_engine_800_running",
           sound_param = {max_hear_distance = 16, gain = 1},
           repeat_timer = 3,
         },
         running = {
-          sound = "power_generators_electric_engine_200_running",
+          sound = "power_generators_electric_engine_800_running",
           sound_param = {max_hear_distance = 16, gain = 1},
           repeat_timer = 1,
         },
       },
     })
 
-local electric_engine_200 = power_generators.electric_engine_200
+local electric_engine_800 = power_generators.electric_engine_800
 
-electric_engine_200:power_data_register(
+electric_engine_800:power_data_register(
   {
     ["LV_power"] = {
-        demand = 200,
+        demand = 800,
         run_speed = 1,
         disable = {}
       },
     ["power_generators_electric_power"] = {
-        demand = 200,
+        demand = 800,
         run_speed = 1,
         disable = {}
       },
   })
-electric_engine_200:control_data_register(
+electric_engine_800:control_data_register(
   {
     ["punch_control"] = {
         power_off_on_deactivate = true,
@@ -87,7 +87,7 @@ if minetest.get_modpath("hades_core") then
    player_inv = "list[current_player;main;0.5,3.5;10,4;]";
 end
 
-function electric_engine_200:get_formspec(meta, production_percent, consumption_percent)
+function electric_engine_800:get_formspec(meta, production_percent, consumption_percent)
   local progress = "";
   
   progress = "image[3.6,0.9;5.5,0.95;appliances_consumption_progress_bar.png^[transformR270]]";
@@ -117,7 +117,7 @@ end
 -- Callbacks --
 ---------------
 
-function electric_engine_200:cb_on_construct(pos)
+function electric_engine_800:cb_on_construct(pos)
   local meta = minetest.get_meta(pos)
   meta:set_string(self.meta_infotext, self.node_description)
   
@@ -128,22 +128,18 @@ function electric_engine_200:cb_on_construct(pos)
   self:call_on_construct(pos, meta)
 end
 
-electric_engine_200.get_torque = power_generators.ee_get_torque
+electric_engine_800.get_torque = power_generators.ee_get_torque
 
-function electric_engine_200:cb_on_production(timer_step)
+function electric_engine_800:cb_on_production(timer_step)
   power_generators.update_shaft_supply(self, timer_step.pos, timer_step.meta, timer_step.speed)
   power_generators.shaft_step(self, timer_step.pos, timer_step.meta, timer_step.use_usage)
 end
 
-function electric_engine_200:cb_waiting(pos, meta)
+function electric_engine_800:cb_waiting(pos, meta)
   power_generators.shaft_step(self, pos, meta, nil)
 end
 
-function electric_engine_200:cb_no_power(pos, meta)
-  power_generators.shaft_step(self, pos, meta, nil)
-end
-
-function electric_engine_200:cb_deactivate(pos, meta)
+function electric_engine_800:cb_no_power(pos, meta)
   power_generators.shaft_step(self, pos, meta, nil)
 end
 
@@ -169,37 +165,39 @@ local node_box = {
     {-0.5,-0.5,-0.5,-0.375,0.5,-0.375},
     {0.375,-0.5,-0.5,0.5,0.5,-0.375},
     {-0.0625,-0.0625,-0.5,0.0625,0.0625,0.5},
-    {-0.375,-0.125,-0.4375,0.375,-0.0625,-0.375},
+    {-0.375,-0.125,-0.4375,0.375,-0.0625,0.4375},
     {-0.125,-0.0625,-0.4375,-0.0625,0.125,0.4375},
     {0.0625,-0.0625,-0.4375,0.125,0.125,0.4375},
-    {-0.375,0.0625,-0.4375,-0.125,0.125,-0.375},
+    {-0.375,0.0625,-0.4375,-0.125,0.125,0.4375},
     {-0.0625,0.0625,-0.4375,0.0625,0.125,0.4375},
-    {0.125,0.0625,-0.4375,0.375,0.125,-0.375},
-    {-0.125,-0.25,-0.375,0.125,-0.0625,0.375},
-    {-0.1875,-0.1875,-0.375,-0.125,0.1875,0.375},
-    {0.125,-0.1875,-0.375,0.1875,0.1875,0.375},
+    {0.125,0.0625,-0.4375,0.375,0.125,0.4375},
+    {-0.1875,-0.375,-0.375,0.1875,-0.125,0.375},
+    {-0.25,-0.3125,-0.375,-0.1875,-0.125,0.375},
+    {0.1875,-0.3125,-0.375,0.25,-0.125,0.375},
+    {-0.3125,-0.25,-0.375,-0.25,-0.125,0.375},
+    {0.25,-0.25,-0.375,0.3125,-0.125,0.375},
+    {-0.375,-0.1875,-0.375,-0.3125,-0.125,0.375},
+    {0.3125,-0.1875,-0.375,0.375,-0.125,0.375},
     {-0.4375,-0.125,-0.375,-0.375,-0.0625,0.5},
-    {-0.25,-0.125,-0.375,-0.1875,0.125,0.375},
-    {0.1875,-0.125,-0.375,0.25,0.125,0.375},
     {0.375,-0.125,-0.375,0.4375,-0.0625,0.5},
+    {-0.375,-0.0625,-0.375,-0.125,0.0625,0.375},
+    {0.125,-0.0625,-0.375,0.375,0.0625,0.375},
     {-0.4375,0.0625,-0.375,-0.375,0.125,0.5},
     {0.375,0.0625,-0.375,0.4375,0.125,0.5},
-    {-0.125,0.125,-0.375,0.125,0.25,0.375},
+    {-0.375,0.125,-0.375,0.375,0.1875,0.375},
+    {-0.3125,0.1875,-0.375,0.3125,0.25,0.375},
+    {-0.25,0.25,-0.375,0.25,0.3125,0.375},
+    {-0.1875,0.3125,-0.375,0.1875,0.375,0.375},
     {-0.4375,-0.0625,-0.125,-0.375,0.0625,0.125},
     {0.375,-0.0625,-0.125,0.4375,0.0625,0.125},
     {-0.5,-0.0625,-0.0625,-0.4375,0.0625,0.0625},
     {0.4375,-0.0625,-0.0625,0.5,0.0625,0.0625},
-    {-0.375,0.0,0.0,-0.25,0.0625,0.0625},
-    {0.25,0.0,0.0,0.375,0.0625,0.0625},
     {-0.5,-0.5,0.375,-0.375,-0.125,0.5},
     {0.375,-0.5,0.375,0.5,-0.125,0.5},
     {-0.5,-0.125,0.375,-0.4375,0.5,0.5},
-    {-0.375,-0.125,0.375,0.375,-0.0625,0.4375},
     {0.4375,-0.125,0.375,0.5,0.5,0.5},
     {-0.4375,-0.0625,0.375,-0.375,0.0625,0.5},
     {0.375,-0.0625,0.375,0.4375,0.0625,0.5},
-    {-0.375,0.0625,0.375,-0.125,0.125,0.4375},
-    {0.125,0.0625,0.375,0.375,0.125,0.4375},
     {-0.4375,0.125,0.375,-0.375,0.5,0.5},
     {0.375,0.125,0.375,0.4375,0.5,0.5},
   },
@@ -213,10 +211,12 @@ local node_def = {
     is_ground_content = false,
     sounds = node_sounds,
     drawtype = "mesh",
-    mesh = "power_generators_shaft_ee_small.obj",
+    mesh = "power_generators_shaft_ee_big.obj",
     use_texture_alpha = "clip",
     collision_box = node_box,
     selection_box = node_box,
+    
+    _inspect_msg_func = power_generators.grease_inspect_msg,
     
     _shaft_sides = _shaft_sides,
  }
@@ -227,8 +227,6 @@ local node_inactive = {
         "power_generators_shaft_steel.png",
         "power_generators_body_steel.png",
         "power_generators_electric_cable.png",
-        "power_generators_electric_engine_200_cable.png",
-        "power_generators_electric_engine_200_moving_parts.png",
     },
   }
 
@@ -238,21 +236,10 @@ local node_active = {
         "power_generators_shaft_steel.png",
         "power_generators_body_steel.png",
         "power_generators_electric_cable.png",
-        "power_generators_electric_engine_200_cable.png",
-        {
-          image = "power_generators_electric_engine_200_moving_parts_active.png",
-          backface_culling = false,
-          animation = {
-            type = "vertical_frames",
-            aspect_w = 16,
-            aspect_h = 16,
-            length = 1.5
-          }
-        }
     },
   }
 
-electric_engine_200:register_nodes(node_def, node_inactive, node_active)
+electric_engine_800:register_nodes(node_def, node_inactive, node_active)
 
 -------------------------
 -- Recipe Registration --

@@ -1,4 +1,6 @@
 
+local S = power_generators.translator
+
 -- moment and revolution
 -- I -> moment of inertia
 -- T -> torque
@@ -42,6 +44,8 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
   local rpmPwr = 0
   local rpmPwrSum = 0
   
+  local have_powered_shaft = false
+  
   for _,side in pairs(self._shaft_sides) do
     local side_pos = appliances.get_side_pos(pos, node, side)
     local side_node = minetest.get_node(side_pos)
@@ -80,20 +84,24 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
           timer = minetest.get_node_timer(side_pos),
           ratio = ratio,
           I = o_I,
-          --T = o_T,
           rpm = o_rpm,
           engine_side = engine_side,
           engine_side_side = engine_side_side,
           side = side,
           side_side = side_side,
-          side_TPart = TPart,
+          
+          --[ [
           name = side_node.name,
+          fric = o_F,
+          side_TPart = TPart,
+          --]]
         })
         if engine_side_side==0 then
           --print(string.format("Usum + s_I + o_I*ratio = %d + %d +%d*%f", Isum, s_I, o_I, ratio))
           Isum = Isum + s_I + o_I*ratio
           minT = minT + side_meta:get_int("minT")*ratio*TPart
           Fsum = Fsum + s_F + o_F*ratio*TPart
+          have_powered_shaft = true
         else
           --Tpwr = Tpwr + o_T*ratio
           if rpmPwr>0 then
@@ -116,7 +124,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
   end
   
   -- losts
-  print(node.name)
+  --print(node.name)
   local friction = self._friction + Fsum
   if not friction then
     friction = meta:get_float("fric")
@@ -138,8 +146,8 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
   friction = friction*(qgrease*rpm+2000000/(3*rpm+1000))
   minT = minT + friction
   --E = math.max(E - friction*(rpm+1000), 0)
-  print("rpmPwr: "..rpmPwr.." Isum: "..Isum.." friction: "..friction.." minT: "..minT)
-  print("shafts: "..dump(shafts))
+  --print("rpmPwr: "..rpmPwr.." Isum: "..Isum.." friction: "..friction.." minT: "..minT)
+  --print("shafts: "..dump(shafts))
   
   -- recalculate
   if rpmPwr>0 then
@@ -156,18 +164,23 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
       --print("meta "..node.name.." "..shaft.side.."_engine: 1")
     elseif (shaft.engine_side~=2) and (rpmPwr==0) then
       meta:set_int(shaft.side.."_engine", 0)
-      meta:set_int("Tsum", 0)
+      --meta:set_int("Tsum", 0)
       --print("meta "..node.name.." "..shaft.side.."_engine: 0")
     elseif (shaft.engine_side_side~=0) then
-      shaft.meta:set_float(shaft.side_side.."_Tpart", shaft.rpm/shaft.ratio/rpmPwrSum)
-      --print("Tpart: "..(shaft.rpm/shaft.ratio/rpmPwrSum))
+      if shaft.engine_side==0 then
+        shaft.meta:set_float(shaft.side_side.."_Tpart", shaft.rpm/shaft.ratio/rpmPwrSum)
+        --print("Tpart: "..(shaft.rpm/shaft.ratio/rpmPwrSum))
+        --print("rpmPwrSum: "..rpmPwrSum)
+      else
+        shaft.meta:set_float(shaft.side_side.."_engine", 0)
+      end
     end
     if new_rpm>0 then
       if (not shaft.timer:is_started()) then
         shaft.timer:start(1)
       end
     end
-    print("rpm: "..new_rpm)
+    --print("rpm: "..new_rpm)
   end
   meta:set_int("L", math.floor(rpm*Isum))
   
@@ -178,7 +191,25 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
     meta:set_int("minT", math.ceil(friction))
     meta:set_int("Isum", math.ceil(I))
   end
-  print("rpm: "..rpm)
+  --print("rpm: "..rpm)
+  
+  if (#shafts==2) and (not have_powered_shaft) and (rpmPwr>0) then
+    local shaft1 = shafts[1]
+    local shaft2 = shafts[2]
+    if shaft1.rpm > shaft2.rpm then
+      --print("Update engine side "..shaft1.name.." to "..shaft2.name)
+      meta:set_int(shaft1.side.."_engine", 0)
+      shaft1.meta:set_int(shaft1.side_side.."_engine", 1)
+      meta:set_int(shaft2.side.."_engine", 1)
+      shaft2.meta:set_int(shaft2.side_side.."_engine", 0)
+    else
+      --print("Update engine side "..shaft2.name.." to "..shaft1.name)
+      meta:set_int(shaft1.side.."_engine", 1)
+      shaft1.meta:set_int(shaft1.side_side.."_engine", 0)
+      meta:set_int(shaft2.side.."_engine", 0)
+      shaft2.meta:set_int(shaft2.side_side.."_engine", 1)
+    end
+  end
 end
 
 function power_generators.update_shaft_supply(self, pos, meta, speed)
@@ -189,7 +220,7 @@ function power_generators.update_shaft_supply(self, pos, meta, speed)
   
   rpm = math.max(rpm + T/I, 0)
   -- minT is used in step function
-  print("T: "..T.." I: "..I.." rpm: "..rpm)
+  --print("T: "..T.." I: "..I.." rpm: "..rpm)
   
   meta:set_int("L", math.ceil(rpm*I))
   if rpm>0 then
@@ -238,3 +269,29 @@ function power_generators.apply_grease(itemstack, user, pointed_thing)
     return minetest.node_punch(pos, node, user, pointed_thing)
   end
 end
+
+function power_generators.grease_inspect_msg(data, level)
+  local meta = minetest.get_meta(data)
+  local agrease = meta:get_float("agrease")
+  local acoef = 0.2
+  local qcoef = 0.1
+  if level==2 then
+    acoef = 0.1
+    qcoef = 0.05
+  elseif level==3 then
+    acoef = 0.05
+    qcoef = 0.01
+  end
+  local aval = math.round(agrease/acoef)*acoef
+  local aop = "< "
+  if aval<agrease then
+    aop = "> "
+  end
+  local qaval = math.round(qgrease/qcoef)*qcoef
+  local msg = S("Discovered level of grease amount is @1.", aop..aval)
+  if level>1 then
+    msg = msg .. "\n" .. S("Discovered quality of grease is @1.", qval)
+  end
+  return msg
+end
+

@@ -1,64 +1,80 @@
--------------------
--- Shaft Gearbox --
--------------------
+
+-------------------------
+-- Combustion engine --
+-------------------------
 ----- Ver 1.0 ---------
 -----------------------
 -- Initial Functions --
 -----------------------
 local S = power_generators.translator;
 
-local _shaft_sides = {"front", "back"}
+local _shaft_sides = {"front"}
 
-power_generators.shaft_gearbox = appliances.appliance:new(
+power_generators.electric_engine_200 = appliances.appliance:new(
     {
-      node_name_inactive = "power_generators:shaft_gearbox",
-      node_name_active = "power_generators:shaft_gearbox_active",
+      node_name_inactive = "power_generators:electric_engine_200",
+      node_name_active = "power_generators:electric_engine_200_active",
       
-      node_description = S("Shaft Gearbox"),
-    	node_help = S("Can be greased.").."\n"..S("Put/take gears to set gear ratio."),
+      node_description = S("Electric engine"),
+    	node_help = S("Connect to power (@1).","200 EU").."\n"..S("Use this for generata shaft torque.").."\n"..S("Startup and Shutdown by punch.").."\n"..S("Can be greased."),
       
-      input_stack_size = 2,
+      input_stack_size = 0,
       have_input = false,
       use_stack_size = 0,
       have_usage = false,
-      output_stack_size = 0,
       
-      power_connect_sides = {"right","left"},
+      power_connect_sides = {"back","right","left"},
       _shaft_sides = _shaft_sides,
-      _friction = 0.01,
-      _I = 50,
-      _maxGears = 10,
+      _friction = 10,
+      _maxT = 20000,
+      -- maxP per step is (maxT/I)*I
+      _maxP = 20000*2000,
+      _limitRpm = 3000,
+      _I = 20,
       
-      _rpm_deactivate = true,
-      _qgrease_max = 6,
-      _qgrease_eff = 5,
+      _qgrease_max = 2,
+      _qgrease_eff = 1,
+      
+      have_control = true,
       
       sounds = {
         active_running = {
-          sound = "power_generators_shaft_gearbox_running",
+          sound = "power_generators_electric_engine_200_running",
           sound_param = {max_hear_distance = 16, gain = 1},
           repeat_timer = 3,
         },
         waiting_running = {
-          sound = "power_generators_shaft_gearbox_running",
+          sound = "power_generators_electric_engine_200_running",
           sound_param = {max_hear_distance = 16, gain = 1},
           repeat_timer = 3,
         },
         running = {
-          sound = "power_generators_shaft_gearbox_running",
+          sound = "power_generators_electric_engine_200_running",
           sound_param = {max_hear_distance = 16, gain = 1},
           repeat_timer = 1,
         },
       },
     })
 
-local shaft_gearbox = power_generators.shaft_gearbox
+local electric_engine_200 = power_generators.electric_engine_200
 
-shaft_gearbox:power_data_register(
+electric_engine_200:power_data_register(
   {
-    ["time_power"] = {
+    ["LV_power"] = {
+        demand = 200,
         run_speed = 1,
         disable = {}
+      },
+    ["power_generators_electric_power"] = {
+        demand = 200,
+        run_speed = 1,
+        disable = {}
+      },
+  })
+electric_engine_200:control_data_register(
+  {
+    ["punch_control"] = {
+        power_off_on_deactivate = true,
       },
   })
 
@@ -71,19 +87,28 @@ if minetest.get_modpath("hades_core") then
    player_inv = "list[current_player;main;0.5,3.5;10,4;]";
 end
 
-function shaft_gearbox:get_formspec(meta, production_percent, consumption_percent)
-  local inv = meta:get_inventory()
-  local cnt1 = inv:get_stack(self.input_stack, 1):get_count()
-  local cnt2 = inv:get_stack(self.input_stack, 2):get_count()
-  local ratio = (cnt1+1).." : "..(cnt2+1)
+function electric_engine_200:get_formspec(meta, production_percent, consumption_percent)
+  local progress = "";
+  
+  progress = "image[3.6,0.9;5.5,0.95;appliances_consumption_progress_bar.png^[transformR270]]";
+  if consumption_percent then
+    progress = "image[3.6,0.9;5.5,0.95;appliances_consumption_progress_bar.png^[lowpart:" ..
+            (consumption_percent) ..
+            ":appliances_consumption_progress_bar_full.png^[transformR270]]";
+  end
+  
+  
+  
   local formspec =  "formspec_version[3]" .. "size[12.75,8.5]" ..
                     "background[-1.25,-1.25;15,10;appliances_appliance_formspec.png]" ..
+                    progress..
                     player_inv ..
-                    "list[context;"..self.input_stack..";2,0.8;1,1;0]"..
-                    "list[context;"..self.input_stack..";9,0.8;1,1;1]"..
-                    "label[5.5,1.5;"..ratio.."]" ..
+                    "list[context;"..self.use_stack..";2,0.8;1,1;]"..
+                    "list[context;"..self.output_stack..";9.75,0.25;2,2;]" ..
                     "listring[current_player;main]" ..
-                    "listring[context;"..self.input_stack.."]" ..
+                    "listring[context;"..self.use_stack.."]" ..
+                    "listring[current_player;main]" ..
+                    "listring[context;"..self.output_stack.."]" ..
                     "listring[current_player;main]";
   return formspec;
 end
@@ -92,75 +117,29 @@ end
 -- Callbacks --
 ---------------
 
-function shaft_gearbox:cb_on_construct(pos)
+function electric_engine_200:cb_on_construct(pos)
   local meta = minetest.get_meta(pos)
   meta:set_string(self.meta_infotext, self.node_description)
-  meta:set_string("formspec", self:get_formspec(meta, 0, 0))
-  local inv = meta:get_inventory()
-  inv:set_size(self.input_stack, self.input_stack_size)
-
+  
   meta:set_int("I", self._I)
+  meta:set_int("Isum", self._I)
   meta:set_int("front_ratio", 1)
-  meta:set_int("back_ratio", 1)
+  meta:set_int("front_engine", 1)
   self:call_on_construct(pos, meta)
 end
 
-function shaft_gearbox:cb_allow_metadata_inventory_put(pos, listname, index, stack, player)
-  local meta = minetest.get_meta(pos)
-  if meta:get_int("rpm")>0 then
-    return 0
-  end
-  local item_name = stack:get_name()
-  if minetest.get_item_group(item_name, "shaft_gear")>0 then
-    local inv = meta:get_inventory()
-    local now_front = inv:get_stack(listname, 1)
-    local now_back = inv:get_stack(listname, 2)
-    local limit = self._maxGears-now_front:get_count()-now_back:get_count()
-    local count = stack:get_count()
-    if count>limit then
-      return math.max(limit, 0)
-    end
-    return count
-  end
-  return 0
-end
-function shaft_gearbox:cb_allow_metadata_inventory_take(pos, listname, index, stack, player)
-  local meta = minetest.get_meta(pos)
-  if meta:get_int("rpm")>0 then
-    return 0
-  end
-  return stack:get_count()
-end
+electric_engine_200.get_torque = power_generators.ee_get_torque
 
-function shaft_gearbox:cb_on_metadata_inventory_put(pos, listname, index, stack, player)
-  local meta = minetest.get_meta(pos)
-  local inv = meta:get_inventory()
-    
-  local cnt1 = inv:get_stack(listname, 1):get_count()
-  local cnt2 = inv:get_stack(listname, 2):get_count()
-  
-  meta:set_float("back_ratio", (1+cnt1)/(1+cnt2))
-  meta:set_int("I", 50+(cnt1+cnt2)*25)
-  meta:set_string("formspec", self:get_formspec(meta, 0, 0))
-end
-
-function shaft_gearbox:cb_on_metadata_inventory_take(pos, listname, index, stack, player)
-  local meta = minetest.get_meta(pos)
-  local inv = meta:get_inventory()
-    
-  local cnt1 = inv:get_stack(listname, 1):get_count()
-  local cnt2 = inv:get_stack(listname, 2):get_count()
-  
-  meta:set_float("back_ratio", (1+cnt1)/(1+cnt2))
-  meta:set_int("I", 50+(cnt1+cnt2)*25)
-  meta:set_string("formspec", self:get_formspec(meta, 0, 0))
-end
-
-function shaft_gearbox:cb_on_production(timer_step)
+function electric_engine_200:cb_on_production(timer_step)
+  power_generators.update_shaft_supply(self, timer_step.pos, timer_step.meta, timer_step.speed)
   power_generators.shaft_step(self, timer_step.pos, timer_step.meta, timer_step.use_usage)
 end
 
-function shaft_gearbox:cb_waiting(pos, meta)
+function electric_engine_200:cb_waiting(pos, meta)
+  power_generators.shaft_step(self, pos, meta, nil)
+end
+
+function electric_engine_200:cb_no_power(pos, meta)
   power_generators.shaft_step(self, pos, meta, nil)
 end
 
@@ -202,10 +181,12 @@ local node_box = {
     {-0.4375,0.0625,-0.375,-0.375,0.125,0.5},
     {0.375,0.0625,-0.375,0.4375,0.125,0.5},
     {-0.125,0.125,-0.375,0.125,0.25,0.375},
-    {-0.4375,-0.0625,-0.125,-0.375,0.0625,-0.0625},
-    {0.375,-0.0625,-0.125,0.4375,0.0625,-0.0625},
-    {-0.4375,-0.0625,0.0625,-0.375,0.0625,0.125},
-    {0.375,-0.0625,0.0625,0.4375,0.0625,0.125},
+    {-0.4375,-0.0625,-0.125,-0.375,0.0625,0.125},
+    {0.375,-0.0625,-0.125,0.4375,0.0625,0.125},
+    {-0.5,-0.0625,-0.0625,-0.4375,0.0625,0.0625},
+    {0.4375,-0.0625,-0.0625,0.5,0.0625,0.0625},
+    {-0.375,0.0,0.0,-0.25,0.0625,0.0625},
+    {0.25,0.0,0.0,0.375,0.0625,0.0625},
     {-0.5,-0.5,0.375,-0.375,-0.125,0.5},
     {0.375,-0.5,0.375,0.5,-0.125,0.5},
     {-0.5,-0.125,0.375,-0.4375,0.5,0.5},
@@ -228,7 +209,7 @@ local node_def = {
     is_ground_content = false,
     sounds = node_sounds,
     drawtype = "mesh",
-    mesh = "power_generators_shaft_gearbox.obj",
+    mesh = "power_generators_shaft_ee_small.obj",
     use_texture_alpha = "clip",
     collision_box = node_box,
     selection_box = node_box,
@@ -243,6 +224,7 @@ local node_inactive = {
         "power_generators_frame_steel.png",
         "power_generators_shaft_steel.png",
         "power_generators_body_steel.png",
+        "power_generators_electric_cable.png",
     },
   }
 
@@ -251,13 +233,13 @@ local node_active = {
         "power_generators_frame_steel.png",
         "power_generators_shaft_steel.png",
         "power_generators_body_steel.png",
+        "power_generators_electric_cable.png",
     },
   }
 
-shaft_gearbox:register_nodes(node_def, node_inactive, node_active)
+electric_engine_200:register_nodes(node_def, node_inactive, node_active)
 
 -------------------------
 -- Recipe Registration --
 -------------------------
-
 

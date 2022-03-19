@@ -107,10 +107,6 @@ function rpm_meter:cb_waiting(pos, meta)
   power_generators.shaft_step(self, pos, meta, nil)
 end
 
-function rpm_meter:cb_deactivate(pos, meta)
-  power_generators.shaft_step(self, pos, meta, nil)
-end
-
 ----------
 -- Node --
 ----------
@@ -192,6 +188,8 @@ local node_def = {
     collision_box = node_box,
     selection_box = node_box,
     
+    _inspect_msg_func = power_generators.grease_inspect_msg,
+    
     _shaft_sides = _shaft_sides,
  }
 
@@ -201,6 +199,7 @@ local node_inactive = {
         "power_generators_shaft_steel.png",
         "power_generators_body_steel.png",
         "power_generators_electric_cable.png",
+        "power_generators_rpm_meter_display.png",
     },
   }
 
@@ -211,15 +210,15 @@ local node_active = {
         "power_generators_body_steel.png",
         "power_generators_electric_cable.png",
         {
-          image = "power_generators_rpm_meter_moving_parts_active.png",
+          image = "power_generators_rpm_meter_display_active.png",
           backface_culling = false,
           animation = {
             type = "vertical_frames",
             aspect_w = 16,
             aspect_h = 16,
-            length = 1.5
+            length = 0.5
           }
-        }
+        },
     },
   }
 
