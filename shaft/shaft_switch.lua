@@ -7,7 +7,7 @@
 -----------------------
 local S = power_generators.translator;
 
-local _shaft_sides = {"front", "back", "right"}
+local _shaft_sides = {"front", "back"}
 
 power_generators.shaft_switch = appliances.appliance:new(
     {
@@ -75,6 +75,11 @@ shaft_switch:control_data_register(
             meta:set_int("back_ratio", 1)
           else
             meta:set_int("back_ratio", 0)
+            meta:set_int("update", 1)
+            local timer = minetest.get_node_timer(pos)
+            if timer:is_started() then
+              timer:start(1)
+            end
           end
         end,
         disable = {}

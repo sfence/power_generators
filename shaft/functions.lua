@@ -23,7 +23,8 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
   local Isum = meta:get_int("Isum")
   local L = meta:get_int("L")
   local rpm = L/Isum
-  if rpm==0 then
+  local need_update = meta:get_int("update")
+  if (rpm==0) and (need_update==0) then
     --local node = minetest.get_node(pos)
     --print("rpm 0 Isum: "..Isum.." L: "..L.." node: "..node.name)
     if self._rpm_deactivate then
@@ -44,7 +45,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
   local rpmPwr = 0
   local rpmPwrSum = 0
   
-  local have_powered_shaft = false
+  local powered_shafts = 0
   
   for _,side in pairs(self._shaft_sides) do
     local side_pos = appliances.get_side_pos(pos, node, side)
@@ -101,7 +102,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
           Isum = Isum + s_I + o_I*ratio
           minT = minT + side_meta:get_int("minT")*ratio*TPart
           Fsum = Fsum + s_F + o_F*ratio*TPart
-          have_powered_shaft = true
+          powered_shafts = powered_shafts + 1
         else
           --Tpwr = Tpwr + o_T*ratio
           if rpmPwr>0 then
@@ -120,6 +121,36 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
       from_pos = side_pos
       side_pos = appliances.get_side_pos(side_pos, side_node, appliances.opposite_side[side_side])
       side_node = minetest.get_node(side_pos)
+    end
+    -- special update code
+    while (ratio==0) and (need_update==1) do
+      local shaft = minetest.get_item_group(side_node.name, "shaft")
+      if shaft<=0 then
+        break
+      end
+      local side_def = minetest.registered_nodes[side_node.name]
+      local side_side = appliances.is_connected_to(side_pos, side_node, from_pos, side_def._shaft_sides)
+      if not side_side then
+        break
+      end
+      local side_meta = minetest.get_meta(side_pos)
+      if shaft==1 then
+        local o_ratio = side_meta:get_float(side_side.."_ratio")
+        if o_ratio==0 then
+          break
+        end
+        local engine_side_side = side_meta:get_int(side_side.."_engine")
+        -- enable update
+        if engine_side_side~=0 then
+          side_meta:set_int("update", 1)
+          local timer = minetest.get_node_timer(side_pos)
+          if not timer:is_started() then
+            timer:start(1)
+          end
+          --print("Apply update for ratio 0 side "..side_node.name)
+        end
+        break
+      end
     end
   end
   
@@ -163,7 +194,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
       meta:set_int(shaft.side.."_engine", 1)
       --print("meta "..node.name.." "..shaft.side.."_engine: 1")
     elseif (shaft.engine_side~=2) and (rpmPwr==0) then
-      meta:set_int(shaft.side.."_engine", 0)
+      --meta:set_int(shaft.side.."_engine", 0)
       --meta:set_int("Tsum", 0)
       --print("meta "..node.name.." "..shaft.side.."_engine: 0")
     elseif (shaft.engine_side_side~=0) then
@@ -179,21 +210,26 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
       if (not shaft.timer:is_started()) then
         shaft.timer:start(1)
       end
+    elseif (need_update==1) and (shaft.engine_side_side~=0) then
+      if (not shaft.timer:is_started()) then
+        shaft.timer:start(1)
+      end
+      shaft.meta:set_int("update", 1)
+      --print(dump(shaft))
     end
     --print("rpm: "..new_rpm)
   end
   meta:set_int("L", math.floor(rpm*Isum))
   
-  if rpm>0 then
-    meta:set_int("minT", math.ceil(minT))
-    meta:set_int("Isum", math.ceil(Isum))
-  else
-    meta:set_int("minT", math.ceil(friction))
-    meta:set_int("Isum", math.ceil(I))
-  end
+  meta:set_int("minT", math.ceil(minT))
+  meta:set_int("Isum", math.ceil(Isum))
   --print("rpm: "..rpm)
   
-  if (#shafts==2) and (not have_powered_shaft) and (rpmPwr>0) then
+  if (need_update==1) then
+    meta:set_int("update", 0)
+  end
+  
+  if (#shafts==2) and (powered_shafts == 0) and (rpmPwr>0) then
     local shaft1 = shafts[1]
     local shaft2 = shafts[2]
     if shaft1.rpm > shaft2.rpm then
@@ -208,6 +244,11 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
       shaft1.meta:set_int(shaft1.side_side.."_engine", 0)
       meta:set_int(shaft2.side.."_engine", 0)
       shaft2.meta:set_int(shaft2.side_side.."_engine", 1)
+    end
+  elseif (#shafts>2) and (powered_shafts==#shafts) then
+    for _, shaft in pairs(shafts) do
+      meta:set_int(shaft.side.."_engine", 0)
+      shaft.meta:set_int(shaft.side_side.."_engine", 0)
     end
   end
 end
@@ -273,6 +314,7 @@ end
 function power_generators.grease_inspect_msg(data, level)
   local meta = minetest.get_meta(data)
   local agrease = meta:get_float("agrease")
+  local qgrease = meta:get_float("qgrease")
   local acoef = 0.2
   local qcoef = 0.1
   if level==2 then
