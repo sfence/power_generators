@@ -155,7 +155,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
   end
   
   -- losts
-  --print(node.name)
+  --print(node.name.." on "..minetest.pos_to_string(pos))
   local friction = self._friction + Fsum
   if not friction then
     friction = meta:get_float("fric")
@@ -203,7 +203,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
         --print("Tpart: "..(shaft.rpm/shaft.ratio/rpmPwrSum))
         --print("rpmPwrSum: "..rpmPwrSum)
       else
-        shaft.meta:set_float(shaft.side_side.."_engine", 0)
+        --shaft.meta:set_float(shaft.side_side.."_engine", 0)
       end
     end
     if new_rpm>0 then
@@ -218,6 +218,11 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
       --print(dump(shaft))
     end
     --print("rpm: "..new_rpm)
+    --[[
+    if shaft.engine_side_side~=0 then
+      print(node.name.." on "..minetest.pos_to_string(pos).." powered from side "..shaft.side.." via "..shaft.name)
+    end
+    --]]
   end
   meta:set_int("L", math.floor(rpm*Isum))
   
@@ -229,7 +234,16 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
     meta:set_int("update", 0)
   end
   
-  if (#shafts==2) and (powered_shafts == 0) and (rpmPwr>0) then
+  if (#shafts==1) and (powered_shafts == 1) then
+    local shaft = shafts[1]
+    --print("Check reset: "..dump(shaft))
+    if (shaft.engine_side==1) then
+      -- not if engine_side is 2
+      meta:set_int(shaft.side.."_engine", 0)
+      shaft.meta:set_int(shaft.side_side.."_engine", 0)
+      --print("Reset engine side "..shaft.name)
+    end
+  elseif (#shafts==2) and (powered_shafts == 0) and (rpmPwr>0) then
     local shaft1 = shafts[1]
     local shaft2 = shafts[2]
     if shaft1.rpm > shaft2.rpm then
@@ -246,6 +260,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
       shaft2.meta:set_int(shaft2.side_side.."_engine", 1)
     end
   elseif (#shafts>2) and (powered_shafts==#shafts) then
+    --print("Reset engine sides "..node.name)
     for _, shaft in pairs(shafts) do
       meta:set_int(shaft.side.."_engine", 0)
       shaft.meta:set_int(shaft.side_side.."_engine", 0)
@@ -301,6 +316,12 @@ function power_generators.apply_grease(itemstack, user, pointed_thing)
         
         meta:set_float("agrease", agrease)
         meta:set_float("qgrease", qgrease/agrease)
+        
+        meta:set_int("update", 1)
+        local timer = minetest.get_node_timer(pos)
+        if not timer:is_started() then
+          timer:start(1)
+        end
         
         itemstack:take_item()
         return itemstack

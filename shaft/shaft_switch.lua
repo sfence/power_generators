@@ -77,7 +77,7 @@ shaft_switch:control_data_register(
             meta:set_int("back_ratio", 0)
             meta:set_int("update", 1)
             local timer = minetest.get_node_timer(pos)
-            if timer:is_started() then
+            if not timer:is_started() then
               timer:start(1)
             end
           end
