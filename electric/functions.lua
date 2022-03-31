@@ -40,10 +40,11 @@ function power_generators.update_generator_supply(sides, pos, use_usage)
         if (demand>0) then
           total_demand = total_demand + demand;
           table.insert(side_data, {
-            meta=meta,
-            demand=demand,
-            set_func=side_def.set_PG_power_input,
-            dir=side_dir});
+            meta = meta,
+            demand = demand,
+            set_func = side_def.set_PG_power_input,
+            dir = side_dir,
+            timer = minetest.get_node_timer(side_pos),});
         else
           meta:set_int("generator_input", 0)
         end
@@ -59,10 +60,16 @@ function power_generators.update_generator_supply(sides, pos, use_usage)
     local part = generator_output/total_demand;
     
     for _,side in pairs(side_data) do
+      local demand = math.floor(side.demand*part)
       if side.set_func then
-        side.set_func(side.meta, side.dir, math.floor(side.demand*part))
+        side.set_func(side.meta, side.dir, demand)
       else
-        side.meta:set_int("generator_input", math.floor(side.demand*part))
+        side.meta:set_int("generator_input", demand)
+      end
+      if demand>0 then
+        if not side.timer:is_started() then
+          side.timer:start(1)
+        end
       end
     end
   end
