@@ -7,7 +7,7 @@ Generators are powered by appliances mod API. So, on appliances APi based machin
 
 Authors of source code
 ----------------------
-Copyright (c) 2021 SFENCE
+Copyright (c) 2021-2022 SFENCE
 MIT - check LICENSE file
 
 Authors of media
@@ -16,14 +16,21 @@ Authors of media
 Models
 ------
 
-Copyright (c) 2021 SFENCE
+Copyright (c) 2021-2022 SFENCE
 CC BY-SA 4.0 - check LICENSE file
 
 Textures
 --------
 
-Copyright (c) 2021 SFENCE
+Copyright (c) 2021-2022 SFENCE
 CC BY-SA 4.0 - check LICENSE file
+All textures not mentioned below.
+
+Copyright (c) 2022 Sinki
+CC BY-SA 4.0 - check LICENSE file
+  power_generators_electric_engine_p6.png
+  power_generators_electric_engine_p12.png
+  power_generators_electric_engine_p24.png
 
 Sounds
 ------

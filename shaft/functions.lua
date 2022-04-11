@@ -333,28 +333,61 @@ function power_generators.apply_grease(itemstack, user, pointed_thing)
 end
 
 function power_generators.grease_inspect_msg(data, level)
-  local meta = minetest.get_meta(data)
-  local agrease = meta:get_float("agrease")
-  local qgrease = meta:get_float("qgrease")
-  local acoef = 0.2
-  local qcoef = 0.1
-  if level==2 then
-    acoef = 0.1
-    qcoef = 0.05
-  elseif level==3 then
-    acoef = 0.05
-    qcoef = 0.01
+  local agrease
+  local qgrease
+  local acoef
+  local qcoef
+  if type(data)=="table" then
+    local meta = minetest.get_meta(data)
+    local agrease = meta:get_float("agrease")
+    local qgrease = meta:get_float("qgrease")
+    local acoef = 0.2
+    local qcoef = 0.1
+    if level==2 then
+      acoef = 0.1
+      qcoef = 0.05
+    elseif level==3 then
+      acoef = 0.05
+      qcoef = 0.01
+    end
+    local aval = math.round(agrease/acoef)*acoef
+    local aop = "< "
+    if aval<agrease then
+      aop = "> "
+    end
+    local qval = math.round(qgrease/qcoef)*qcoef
+    local msg = S("Discovered level of grease amount is @1.", aop..aval)
+    if level>1 then
+      msg = msg .. "\n" .. S("Discovered quality of grease is @1.", qval)
+    end
+    return msg
+  else
+    local def = data:get_definition()
+    if not def._agrease then
+      return def.description
+    end
+    local agrease = def._agrease
+    local qgrease = def._qgrease
+    local acoef = 0.4
+    local qcoef = 0.2
+    if level==2 then
+      acoef = 0.2
+      qcoef = 0.1
+    elseif level==3 then
+      acoef = 0.1
+      qcoef = 0.05
+    end
+    local aval = math.round(agrease/acoef)*acoef
+    local aop = "< "
+    if aval<agrease then
+      aop = "> "
+    end
+    local qval = math.round(qgrease/qcoef)*qcoef
+    local msg = S("Discover level of inventory grease amount is @1.", aop..aval)
+    if level>1 then
+      msg = msg .. "\n" .. S("Discovered quality of inventory grease is @1.", qval)
+    end
+    return msg
   end
-  local aval = math.round(agrease/acoef)*acoef
-  local aop = "< "
-  if aval<agrease then
-    aop = "> "
-  end
-  local qaval = math.round(qgrease/qcoef)*qcoef
-  local msg = S("Discovered level of grease amount is @1.", aop..aval)
-  if level>1 then
-    msg = msg .. "\n" .. S("Discovered quality of grease is @1.", qval)
-  end
-  return msg
 end
 
