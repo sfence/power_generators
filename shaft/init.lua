@@ -15,8 +15,8 @@ dofile(modpath.."/shaft_gearbox.lua")
 dofile(modpath.."/rpm_meter_watt.lua")
 
 dofile(modpath.."/electric_engine_200.lua")
-dofile(modpath.."/electric_engine_400.lua")
-dofile(modpath.."/electric_engine_800.lua")
+--dofile(modpath.."/electric_engine_400.lua")
+--dofile(modpath.."/electric_engine_800.lua")
 dofile(modpath.."/rpm_meter.lua")
 
 dofile(modpath.."/greases.lua")
