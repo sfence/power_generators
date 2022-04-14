@@ -29,6 +29,11 @@ end
 function power_generators.update_generator_supply(sides, pos, use_usage)
   local side_data = {};
   local total_demand = 0;
+  local generator_output = 0;
+  if use_usage then
+    generator_output = use_usage.generator_output or 150;
+  end
+  local need_update = minetest.get_meta(pos):get_int("update")
   for _,side in pairs(sides) do
     local side_pos, side_dir = get_connected_node(pos, tubelib2_side[side])
     if side_pos then
@@ -36,6 +41,7 @@ function power_generators.update_generator_supply(sides, pos, use_usage)
       local side_def = minetest.registered_nodes[side_node.name];
       if side_def and side_def._generator_connect_sides then
         local meta = minetest.get_meta(side_pos);
+        local timer = minetest.get_node_timer(side_pos);
         local demand = meta:get_int("generator_demand") or 0
         if (demand>0) then
           total_demand = total_demand + demand;
@@ -44,19 +50,21 @@ function power_generators.update_generator_supply(sides, pos, use_usage)
             demand = demand,
             set_func = side_def.set_PG_power_input,
             dir = side_dir,
-            timer = minetest.get_node_timer(side_pos),});
+            timer = timer,});
         else
           meta:set_int("generator_input", 0)
+          if (generator_output>0) or (need_update>0) then
+            if not timer:is_started() then
+              meta:set_int("update", 1)
+              timer:start(1)
+            end
+          end
         end
       end
     end
   end
   
   if (total_demand>0) then
-    local generator_output = 0;
-    if use_usage then
-      generator_output = use_usage.generator_output or 150;
-    end
     local part = generator_output/total_demand;
     
     for _,side in pairs(side_data) do

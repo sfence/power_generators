@@ -75,9 +75,11 @@ minetest.register_node("power_generators:junction_box", {
     end
     local total_demand = power_generators.update_generator_supply(appliances.all_sides, pos, {generator_output = generators_input})
     meta:set_int("generator_demand", total_demand)
-    if generators_input==0 then
+    local need_update = meta:get_int("update")
+    if (not need_update) and (generators_input==0) then
       return false
     end
+    meta:set_int("update", 0)
     return true
   end,
   on_punch = function(pos)
