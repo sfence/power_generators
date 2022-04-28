@@ -16,7 +16,7 @@ power_generators.electric_engine_400 = appliances.appliance:new(
       node_name_active = "power_generators:electric_engine_400_active",
       
       node_description = S("Electric engine"),
-    	node_help = S("Connect to power (@1).","400 EU").."\n"..S("Use this for generata shaft torque.").."\n"..S("Startup and Shutdown by punch.").."\n"..S("Can be greased."),
+    	node_help = S("Use this for generata shaft torque.").."\n"..S("Startup and Shutdown by punch.").."\n"..S("Can be greased."),
       
       input_stack_size = 0,
       have_input = false,
@@ -25,10 +25,10 @@ power_generators.electric_engine_400 = appliances.appliance:new(
       
       power_connect_sides = {"back","right","left"},
       _shaft_sides = _shaft_sides,
-      _friction = 10,
-      _maxT = 40000,
+      _friction = 20,
+      _maxT = 40000*2,
       -- maxP per step is (maxT/I)*I
-      _maxP = 40000*1000,
+      _maxP = 40000*1000*2,
       _limitRpm = 1000,
       _I = 60,
       
@@ -60,15 +60,33 @@ local electric_engine_400 = power_generators.electric_engine_400
 
 electric_engine_400:power_data_register(
   {
+    ["no_power"] = {
+        disable = {}
+      },
     ["LV_power"] = {
         demand = 400,
         run_speed = 1,
-        disable = {}
+        disable = {"no_power"}
       },
     ["power_generators_electric_power"] = {
         demand = 400,
         run_speed = 1,
-        disable = {}
+        disable = {"no_power"}
+      },
+    ["elepower_power"] = {
+        demand = 32,
+        run_speed = 1,
+        disable = {"no_power"}
+      },
+    ["techage_electric_power"] = {
+        demand = 160,
+        run_speed = 1,
+        disable = {"no_power"}
+      },
+    ["factory_power"] = {
+        demand = 20,
+        run_speed = 1,
+        disable = {"no_power"}
       },
   })
 electric_engine_400:control_data_register(
@@ -77,6 +95,8 @@ electric_engine_400:control_data_register(
         power_off_on_deactivate = true,
       },
   })
+
+electric_engine_400.node_help = S("Connect to power (@1).", electric_engine_400:get_power_help()).."\n"..electric_engine_400.node_help
 
 --------------
 -- Formspec --

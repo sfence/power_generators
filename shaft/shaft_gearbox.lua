@@ -242,7 +242,7 @@ local node_inactive = {
     tiles = {
         "power_generators_frame_steel.png",
         "power_generators_shaft_steel.png",
-        "power_generators_body_steel.png",
+        "power_generators_body_steel.png^power_generators_shaft_sides.png",
     },
   }
 
@@ -250,7 +250,7 @@ local node_active = {
     tiles = {
         "power_generators_frame_steel.png",
         "power_generators_shaft_steel.png",
-        "power_generators_body_steel.png",
+        "power_generators_body_steel.png^power_generators_shaft_sides.png",
     },
   }
 

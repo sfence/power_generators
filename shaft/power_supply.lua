@@ -1,5 +1,8 @@
 
+local S = power_generators.translator
+
 local power_supply = {
+    units = S("PG shaft"),
     is_powered = function (self, power_data, pos, meta)
         local I = meta:get_int("I");
         local L = meta:get_int("L")

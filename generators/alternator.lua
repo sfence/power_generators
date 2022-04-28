@@ -7,6 +7,7 @@
 -- Initial Functions --
 -----------------------
 local S = power_generators.translator;
+local Cable = power_generators.electric_cable
 
 power_generators.alternator = appliances.appliance:new(
     {
@@ -14,12 +15,15 @@ power_generators.alternator = appliances.appliance:new(
       node_name_active = "power_generators:alternator_active",
       
       node_description = S("Alternator"),
-    	node_help = S("Fill it with liquid fuel.").."\n"..S("Use this for generate 150 unit of energy.").."\n"..S("Startup and Shutdown by punch."),
+    	node_help = S("Use this for generate energy depend on rpm."),
       
       input_stack_size = 0,
       have_input = false,
+      use_stack_size = 0,
+      have_usage = false,
       
-      power_connect_sides = {"back","right","left"},
+      power_connect_sides = {"back"},
+      out_power_connect_sides = {"left", "right", "front"},
       
       have_control = true,
       
@@ -58,11 +62,18 @@ local alternator = power_generators.alternator
 
 alternator:power_data_register(
   {
-    ["power_generators_torque"] = {
+    ["no_power"] = {
+    },
+    ["power_generators_shaft_power"] = {
         -- 60% efficiency
-        minT = 200,
         run_speed = 1,
-        disable = {}
+        friction = 25,
+        I = 25,
+        qgrease_max = 2,
+        qgrease_eff = 1,
+        rpm_deactivate = true,
+        demand = 250, -- min rpm to do something
+        disable = {"no_power"}
       },
   })
 alternator:control_data_register(
@@ -76,35 +87,8 @@ alternator:control_data_register(
 -- Formspec --
 --------------
 
-local player_inv = "list[current_player;main;1.5,3.5;8,4;]";
-if minetest.get_modpath("hades_core") then
-   player_inv = "list[current_player;main;0.5,3.5;10,4;]";
-end
-
 function alternator:get_formspec(meta, production_percent, consumption_percent)
-  local progress = "";
-  
-  progress = "image[3.6,0.9;5.5,0.95;appliances_consumption_progress_bar.png^[transformR270]]";
-  if consumption_percent then
-    progress = "image[3.6,0.9;5.5,0.95;appliances_consumption_progress_bar.png^[lowpart:" ..
-            (consumption_percent) ..
-            ":appliances_consumption_progress_bar_full.png^[transformR270]]";
-  end
-  
-  
-  
-  local formspec =  "formspec_version[3]" .. "size[12.75,8.5]" ..
-                    "background[-1.25,-1.25;15,10;appliances_appliance_formspec.png]" ..
-                    progress..
-                    player_inv ..
-                    "list[context;"..self.use_stack..";2,0.8;1,1;]"..
-                    "list[context;"..self.output_stack..";9.75,0.25;2,2;]" ..
-                    "listring[current_player;main]" ..
-                    "listring[context;"..self.use_stack.."]" ..
-                    "listring[current_player;main]" ..
-                    "listring[context;"..self.output_stack.."]" ..
-                    "listring[current_player;main]";
-  return formspec;
+  return ""
 end
 
 ---------------
@@ -113,15 +97,23 @@ end
 
 
 function alternator:cb_on_production(timer_step)
-  power_generators.update_generator_supply(self.power_connect_sides, timer_step.pos, timer_step.use_usage)
+  local meta = timer_step.meta
+  local I = meta:get_int("I");
+  local L = meta:get_int("L")
+  local rpm = L/I
+  local use_usage = {
+    --generator_output = math.floor(rpm*0.24), -- idela greaser, etc 60% eff for 400 engine at 1000 rpm
+    generator_output = math.floor(rpm*0.3), -- reflect not ideal greasers, so some reserve... for ideal greaser make 75% eff at 1000 rpm for 400 engine
+  }
+  power_generators.update_generator_supply(self.out_power_connect_sides, timer_step.pos, use_usage)
 end
 
 function alternator:cb_waiting(pos, meta)
-  power_generators.update_generator_supply(self.power_connect_sides, pos, nil)
+  power_generators.update_generator_supply(self.out_power_connect_sides, pos, nil)
 end
 
 function alternator:cb_deactivate(pos, meta)
-  power_generators.update_generator_supply(self.power_connect_sides, pos, nil)
+  power_generators.update_generator_supply(self.out_power_connect_sides, pos, nil)
 end
 
 ----------
@@ -236,95 +228,36 @@ local node_def = {
     use_texture_alpha = "clip",
     collision_box = node_box,
     selection_box = node_box,
+    
+    _inspect_msg_func = power_generators.grease_inspect_msg,
  }
 
 local node_inactive = {
     tiles = {
-        "power_generators_alternator_frame_lid_hose.png",
-        "power_generators_alternator_front_panel_body.png",
-        "power_generators_alternator_back_body.png",
-        "power_generators_alternator_tank.png",
-        "power_generators_alternator_cable.png",
-        "power_generators_alternator_moving_parts.png",
+      "power_generators_frame_steel.png",
+      "power_generators_shaft_steel.png",
+      "power_generators_body_steel.png",
+      "power_generators_electric_cable.png",
     },
   }
 
 local node_active = {
     tiles = {
-        "power_generators_alternator_frame_lid_hose.png",
-        "power_generators_alternator_front_panel_body.png",
-        "power_generators_alternator_back_body.png",
-        "power_generators_alternator_tank.png",
-        "power_generators_alternator_cable.png",
-        {
-          image = "power_generators_alternator_moving_parts_active.png",
-          backface_culling = false,
-          animation = {
-            type = "vertical_frames",
-            aspect_w = 16,
-            aspect_h = 16,
-            length = 1.5
-          }
-        }
+      "power_generators_frame_steel.png",
+      "power_generators_shaft_steel.png",
+      "power_generators_body_steel.png",
+      "power_generators_electric_cable.png",
     },
   }
 
 alternator:register_nodes(node_def, node_inactive, node_active)
 
+Cable:add_secondary_node_names({alternator.node_name_active, alternator.node_name_inactive})
+--Cable:add_special_node_names({name})
+Cable:set_valid_sides(alternator.node_name_active, {"R", "L", "F"})
+Cable:set_valid_sides(alternator.node_name_inactive, {"R", "L", "F"})
+
 -------------------------
 -- Recipe Registration --
 -------------------------
-
-local items = {
-  phial_fuel = "biofuel:phial_fuel",
-  phial_empty = "biofuel:phial",
-  bottle_fuel = "biofuel:bottle_fuel",
-  bottle_empty = "vessels:glass_bottle",
-  can_fuel = "biofuel:fuel_can",
-  can_empty = "biofuel:can",
-}
-
-if minetest.get_modpath("hades_biofuel") then
-  items.phial_fuel = "hades_biofuel:phial_fuel"
-  items.phial_empty = "hades_biofuel:phial"
-  items.bottle_fuel = "hades_biofuel:bottle_fuel"
-  items.bottle_empty = "vessels:glass_bottle"
-  items.can_fuel = "hades_biofuel:fuel_can"
-  items.can_empty = "hades_biofuel:can"
-end
-
--- hope, temporary only support for biofuel withou vessels manageent
-if not minetest.registered_items[items.phial_empty] then
-  items.phial_empty = nil
-  items.bottle_empty = nil
-  items.can_empty = nil
-end
-
-alternator:recipe_register_usage(
-	items.phial_fuel,
-	{
-		inputs = 1,
-		outputs = {items.phial_empty},
-		consumption_time = 2,
-		consumption_step_size = 1,
-    generator_output = 150,
-	});
-alternator:recipe_register_usage(
-	items.bottle_fuel,
-	{
-		inputs = 1,
-		outputs = {items.bottle_empty},
-		consumption_time = 20,
-		consumption_step_size = 1,
-    generator_output = 150,
-	});
-alternator:recipe_register_usage(
-	items.can_fuel,
-	{
-		inputs = 1,
-		outputs = {items.can_empty},
-		consumption_time = 160,
-		consumption_step_size = 1,
-    generator_output = 150,
-	});
 

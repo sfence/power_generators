@@ -1,6 +1,8 @@
 
 -- register power supply to power generators
 
+local S = power_generators.translator
+
 local Cable = power_generators.electric_cable
 
 local tubelib2_side = {
@@ -13,6 +15,7 @@ local tubelib2_side = {
   }
 
 local power_supply = {
+    units = S("PG EU"),
     is_powered = function (self, power_data, pos, meta)
         local eu_input = meta:get_int("generator_input");
         local demand = power_data.demand or power_data.get_demand(self, pos, meta)
