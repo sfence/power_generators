@@ -225,6 +225,15 @@ minetest.register_craft({
   })
 
 minetest.register_craft({
+    output = "power_generators:alternator",
+    recipe = {
+      {"power_generators:framework",items.iron_ingot,"power_generators:electric_cableS"},
+      {items.iron_ingot,"power_generators:electric_engine_p24",items.iron_ingot},
+      {items.transformer,items.iron_ingot, items.transformer},
+    }
+  })
+
+minetest.register_craft({
     output = "power_generators:shaft 3",
     recipe = {
       {items.strong_ingot,},

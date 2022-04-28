@@ -25,8 +25,6 @@ power_generators.alternator = appliances.appliance:new(
       power_connect_sides = {"back"},
       out_power_connect_sides = {"left", "right", "front"},
       
-      have_control = true,
-      
       sounds = {
         active_running = {
           sound = "power_generators_alternator_startup",
@@ -72,14 +70,8 @@ alternator:power_data_register(
         qgrease_max = 2,
         qgrease_eff = 1,
         rpm_deactivate = true,
-        demand = 250, -- min rpm to do something
+        demand = 1, -- min rpm to do something
         disable = {"no_power"}
-      },
-  })
-alternator:control_data_register(
-  {
-    ["punch_control"] = {
-        power_off_on_deactivate = true,
       },
   })
 
@@ -105,6 +97,9 @@ function alternator:cb_on_production(timer_step)
     --generator_output = math.floor(rpm*0.24), -- idela greaser, etc 60% eff for 400 engine at 1000 rpm
     generator_output = math.floor(rpm*0.3), -- reflect not ideal greasers, so some reserve... for ideal greaser make 75% eff at 1000 rpm for 400 engine
   }
+  if (rpm<250) then
+    use_usage.generator_output = use_usage.generator_output*rpm/250
+  end
   power_generators.update_generator_supply(self.out_power_connect_sides, timer_step.pos, use_usage)
 end
 

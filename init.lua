@@ -1,4 +1,6 @@
 
+minetest.log("action", "[MOD] Power Generators loading...")
+
 power_generators = {
   translator = minetest.get_translator("power_generators")
 }
@@ -20,4 +22,6 @@ dofile(modpath.."/generators/init.lua")
 dofile(modpath.."/nodes.lua")
 dofile(modpath.."/craftitems.lua")
 dofile(modpath.."/crafting.lua")
+
+minetest.log("action", "[MOD] Power Generators loaded.")
 

@@ -8,5 +8,5 @@ dofile(modpath.."/alternator.lua")
 
 dofile(modpath.."/test_generator.lua")
 
---dofile(modpath.."/craftitems.lua")
+dofile(modpath.."/craftitems.lua")
 
