@@ -44,7 +44,7 @@ power_generators.combustion_engine_6c = appliances.appliance:new(
       node_name_active = "power_generators:combustion_engine_6c_active",
       
       node_description = S("Combustion engine"),
-    	node_help = S("Fill it with liquid fuel.").."\n"..S("Use this for generate 150 unit of energy.").."\n"..S("Startup and Shutdown by punch."),
+    	node_help = S("Can be greased.").."\n"..S("Use this for generate shaft power up to @1.", "283k").."\n"..S("Fuel supply open and close by punch.").."\n"..S("Place fuel tank on top."),
       
       input_stack_size = 0,
       have_input = false,
@@ -57,7 +57,7 @@ power_generators.combustion_engine_6c = appliances.appliance:new(
       have_control = true,
       
       _shaft_sides = _shaft_sides,
-      _friction = 10,
+      _friction = 30,
       _I = 150,
       -- maxP per step is (maxT/I)*I
       _coef0 = -1768.3608*2.5,
@@ -117,7 +117,8 @@ function combustion_engine_6c:get_formspec(meta, production_percent, consumption
                     "background[-1.25,-1.25;8,10;appliances_appliance_formspec.png]" ..
                     "scrollbaroptions[min=200;max=1200;smallstep=1;largestep=20]" ..
                     bar ..
-                    "label[1.5,8;"..minetest.formspec_escape(S("Throttle @1", throttle)).."]";
+                    "style_type[label;textcolor=black]" ..
+                    "label[2,8;"..minetest.formspec_escape(S("Throttle @1%", math.round(throttle*100))).."]";
   return formspec;
 end
 

@@ -131,3 +131,6 @@ minetest.register_node("power_generators:fuel_tank", {
       update_info(pos, {name="power_generators:fuel_tank"}, meta)
     end,
   })
+
+appliances.add_item_help("power_generators:fuel_tank", S("Fill it with liquid fuel by puncing."))
+

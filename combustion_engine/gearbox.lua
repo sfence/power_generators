@@ -11,11 +11,11 @@ local _shaft_sides = {"front", "back", "top"}
 
 power_generators.ce_gearbox = appliances.appliance:new(
     {
-      node_name_inactive = "power_generators:ce_gearbox",
-      node_name_active = "power_generators:ce_gearbox_active",
+      node_name_inactive = "power_generators:gearbox",
+      node_name_active = "power_generators:gearbox_active",
       
-      node_description = S("Combustion engine gear box"),
-    	node_help = S("Fill it with liquid fuel.").."\n"..S("Use this for generate 150 unit of energy.").."\n"..S("Startup and Shutdown by punch."),
+      node_description = S("Gearbox for Combustion Engine with External Starter"),
+    	node_help = S("Can be greased.").."\n"..S("Change gear by punch (neutral/shaft/starter).").."\n"..S("Place starter on top."),
       
       input_stack_size = 0,
       have_input = false,

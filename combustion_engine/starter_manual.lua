@@ -31,7 +31,7 @@ power_generators.starter_manual = appliances.appliance:new(
       node_name_active = "power_generators:starter_manual_active",
       
       node_description = S("Combustion Engine Manual Starter"),
-    	node_help = S("Fill it with liquid fuel.").."\n"..S("Use this for generate 150 unit of energy.").."\n"..S("Startup and Shutdown by punch."),
+    	node_help = S("Can be greased.").."\n"..S("Crank up starter by punching."),
       
       input_stack_size = 0,
       have_input = false,

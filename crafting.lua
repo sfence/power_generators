@@ -23,6 +23,9 @@ local items = {
   glow_crystal = "default:mese_crystal_fragment",
   
   dye_yellow = "dye:yellow",
+  
+  valve = "pipeworks:valve_off_empty",
+  rubber = "technic:rubber",
 }
 
 if minetest.get_modpath("hades_core") then
@@ -56,6 +59,8 @@ if minetest.get_modpath("technic") then
   items.controller = "technic:control_logic_unit"
   
   items.transformer = "technic:lv_transformer"
+  
+  items.rubber = "technic:rubber"
 end
 
 if minetest.get_modpath("hades_technic") then
@@ -65,6 +70,8 @@ if minetest.get_modpath("hades_technic") then
   items.controller = "hades_technic:control_logic_unit"
   
   items.transformer = "hades_technic:lv_transformer"
+  
+  items.rubber = "hades_technic:rubber"
 end
 
 minetest.register_craft({
@@ -141,11 +148,10 @@ minetest.register_craft({
     }
   })
 
---[[
 minetest.register_craft({
     output = "power_generators:combustion_engine_body_4",
     recipe = {
-      {items.metal_ingot, items.metal_ingot, items.metal_ingot},
+      {items.metal_ingot, items.metal_ingot},
       {"power_generators:combustion_engine_body_2","power_generators:combustion_engine_body_2"},
       {"power_generators:combustion_engine_crankshaft","power_generators:combustion_engine_crankshaft"},
     }
@@ -157,6 +163,17 @@ minetest.register_craft({
       {items.metal_ingot, items.metal_ingot, items.metal_ingot},
       {"power_generators:combustion_engine_body_2","power_generators:combustion_engine_body_2", "power_generators:combustion_engine_body_2"},
       {"power_generators:combustion_engine_crankshaft","power_generators:combustion_engine_crankshaft","power_generators:combustion_engine_crankshaft"},
+    }
+  })
+
+
+--[[
+minetest.register_craft({
+    output = "power_generators:combustion_engine_body_8",
+    recipe = {
+      {items.metal_ingot, items.metal_ingot},
+      {"power_generators:combustion_engine_body_4","power_generators:combustion_engine_body_4"},
+      {"power_generators:combustion_engine_crankshaft","power_generators:combustion_engine_crankshaft"},
     }
   })
 --]]
@@ -175,6 +192,15 @@ minetest.register_craft({
     recipe = {
       {items.metal_ingot, items.controller, items.metal_ingot},
       {items.copper_wire, "power_generators:combustion_engine_body_2_controlled", items.copper_wire},
+      {items.metal_ingot, "power_generators:shaft", items.metal_ingot},
+    }
+  })
+
+minetest.register_craft({
+    output = "power_generators:combustion_engine_six_cylinders",
+    recipe = {
+      {items.metal_ingot, "", items.metal_ingot},
+      {items.copper_wire, "power_generators:combustion_engine_body_6", items.copper_wire},
       {items.metal_ingot, "power_generators:shaft", items.metal_ingot},
     }
   })
@@ -232,6 +258,62 @@ minetest.register_craft({
       {items.transformer,items.iron_ingot, items.transformer},
     }
   })
+
+minetest.register_craft({
+    output = "power_generators:fuel_hosepipe",
+    recipe = {
+      {"",items.rubber,""},
+      {items.rubber,"",items.rubber},
+      {"",items.rubber,""},
+    }
+  })
+
+minetest.register_craft({
+    output = "power_generators:fuel_tank",
+    recipe = {
+      {"","power_generators:combustion_engine_fuel_tank",items.rubber},
+      {"power_generators:combustion_engine_fuel_tank","power_generators:framework","power_generators:combustion_engine_fuel_tank"},
+      {"","power_generators:combustion_engine_fuel_tank","power_generators:fuel_hosepipe"},
+    }
+  })
+
+minetest.register_craft({
+    output = "power_generators:gearbox",
+    recipe = {
+      {items.steel_strip,items.steel_strip,"power_generators:combustion_engine_gearbox"},
+      {items.steel_strip,"power_generators:framework","power_generators:shaft"},
+      {"power_generators:combustion_engine_gearbox","power_generators:shaft","power_generators:combustion_engine_gearbox"},
+    }
+  })
+
+minetest.register_craft({
+    output = "power_generators:starter_manual",
+    recipe = {
+      {"power_generators:carbon_steel_bar",items.steel_strip,"power_generators:carbon_steel_bar"},
+      {items.steel_strip,"power_generators:framework","power_generators:shaft"},
+      {"power_generators:combustion_engine_gearbox","power_generators:shaft","power_generators:combustion_engine_gearbox"},
+    }
+  })
+
+minetest.register_craft({
+    output = "power_generators:combustion_engine_6c",
+    recipe = {
+      {"power_generators:framework","power_generators:fuel_hosepipe"},
+      {items.steel_strip,items.valve},
+      {"power_generators:shaft","power_generators:combustion_engine_six_cylinders"},
+    }
+  })
+
+--[[
+minetest.register_craft({
+    output = "power_generators:combustion_engine_8c",
+    recipe = {
+      {"power_generators:framework","power_generators:fuel_hosepipe"},
+      {items.steel_strip,items.steel_strip},
+      {"power_generators:shaft","power_generators:combustion_engine_eight_cylinders"},
+    }
+  })
+--]]
 
 minetest.register_craft({
     output = "power_generators:shaft 3",

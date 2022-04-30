@@ -14,3 +14,5 @@ dofile(modpath.."/starter_manual.lua")
 
 dofile(modpath.."/adaptation.lua")
 
+dofile(modpath.."/craftitems.lua")
+

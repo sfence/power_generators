@@ -48,6 +48,10 @@ minetest.register_craftitem("power_generators:combustion_engine_two_cylinders_co
     description = S("Combustion Engine Two Cylinders"),
     inventory_image = "power_generators_combustion_engine_two_cylinders.png",
   })
+minetest.register_craftitem("power_generators:combustion_engine_six_cylinders", {
+    description = S("Combustion Engine Six Cylinders Without Controller"),
+    inventory_image = "power_generators_combustion_engine_six_cylinders.png",
+  })
 
 minetest.register_craftitem("power_generators:combustion_engine_gearbox", {
     description = S("Combustion Engine Gearbox"),
