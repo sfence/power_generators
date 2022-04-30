@@ -324,6 +324,15 @@ function power_generators.apply_grease(itemstack, user, pointed_thing)
         end
         
         itemstack:take_item()
+        
+        if idef._grease_empty then
+          local inv = user:get_inventory()
+          local notadd = inv:add_item("main", ItemStack(idef._grease_empty))
+          if notadd:get_count()>0 then
+            minetest.add_item(user:get_pos(), notadd)
+          end
+        end
+        
         return itemstack
       end
       
