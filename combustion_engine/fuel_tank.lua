@@ -132,5 +132,5 @@ minetest.register_node("power_generators:fuel_tank", {
     end,
   })
 
-appliances.add_item_help("power_generators:fuel_tank", S("Fill it with liquid fuel by puncing."))
+appliances.add_item_help("power_generators:fuel_tank", S("Fill it with liquid fuel by punching."))
 
