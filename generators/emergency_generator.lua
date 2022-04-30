@@ -14,7 +14,7 @@ power_generators.emergency_generator = appliances.appliance:new(
       node_name_active = "power_generators:emergency_generator_active",
       
       node_description = S("Emergency generator"),
-    	node_help = S("Fill it with liquid fuel.").."\n"..S("Use this for generate 150 unit of energy.").."\n"..S("Startup and Shutdown by punch."),
+    	node_help = S("Fill it with liquid fuel.").."\n"..S("Use this for generate 150 PG EU.").."\n"..S("Startup and Shutdown by punch."),
       
       input_stack_size = 0,
       have_input = false,

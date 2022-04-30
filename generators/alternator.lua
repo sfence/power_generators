@@ -15,7 +15,7 @@ power_generators.alternator = appliances.appliance:new(
       node_name_active = "power_generators:alternator_active",
       
       node_description = S("Alternator"),
-    	node_help = S("Use this for generate energy depend on rpm."),
+    	node_help = S("Use this for generate energy PG EU depend on rpm."),
       
       input_stack_size = 0,
       have_input = false,

@@ -25,7 +25,7 @@ local items = {
   dye_yellow = "dye:yellow",
   
   valve = "pipeworks:valve_off_empty",
-  rubber = "technic:rubber",
+  rubber = "mesecons_materials:fiber",
 }
 
 if minetest.get_modpath("hades_core") then
@@ -72,6 +72,14 @@ if minetest.get_modpath("hades_technic") then
   items.transformer = "hades_technic:lv_transformer"
   
   items.rubber = "hades_technic:rubber"
+end
+
+if minetest.get_modpath("elepower_dynamics") then
+  items.valve = "elepower_dynamics:servo_valve"
+end
+
+if minetest.get_modpath("techage") then
+  items.valve = "techage:ta3_valve_open"
 end
 
 minetest.register_craft({

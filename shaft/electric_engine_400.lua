@@ -16,7 +16,7 @@ power_generators.electric_engine_400 = appliances.appliance:new(
       node_name_active = "power_generators:electric_engine_400_active",
       
       node_description = S("Electric engine"),
-    	node_help = S("Use this for generata shaft torque.").."\n"..S("Startup and Shutdown by punch.").."\n"..S("Can be greased."),
+    	node_help = S("Use this for generate shaft power up to @1.", "80M").."\n"..S("Startup and Shutdown by punch.").."\n"..S("Can be greased."),
       
       input_stack_size = 0,
       have_input = false,
@@ -40,32 +40,32 @@ power_generators.electric_engine_400 = appliances.appliance:new(
       sounds = {
         active_running = {
           sound = "power_generators_electric_engine_startup",
-          sound_param = {max_hear_distance = 32, gain = 1.41},
+          sound_param = {max_hear_distance = 24, gain = 1.41},
         },
         waiting_running = {
           sound = "power_generators_electric_engine_startup",
-          sound_param = {max_hear_distance = 32, gain = 1.41},
+          sound_param = {max_hear_distance = 24, gain = 1.41},
         },
         nopower_running = {
           sound = "power_generators_electric_engine_startup",
-          sound_param = {max_hear_distance = 32, gain = 1.41},
+          sound_param = {max_hear_distance = 24, gain = 1.41},
         },
         running = {
           sound = "power_generators_electric_engine_running",
-          sound_param = {max_hear_distance = 32, gain = 1.41, loop = true},
+          sound_param = {max_hear_distance = 24, gain = 1.41, loop = true},
           key = "running",
         },
         running_idle = {
           sound = "power_generators_electric_engine_shutdown",
-          sound_param = {max_hear_distance = 32, gain = 1.41},
+          sound_param = {max_hear_distance = 24, gain = 1.41},
         },
         running_nopower = {
           sound = "power_generators_electric_engine_shutdown",
-          sound_param = {max_hear_distance = 32, gain = 1.41},
+          sound_param = {max_hear_distance = 24, gain = 1.41},
         },
         running_waiting = {
           sound = "power_generators_electric_engine_shutdown",
-          sound_param = {max_hear_distance = 32, gain = 1.41},
+          sound_param = {max_hear_distance = 24, gain = 1.41},
         },
       },
     })

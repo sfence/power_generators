@@ -44,7 +44,7 @@ power_generators.combustion_engine_6c = appliances.appliance:new(
       node_name_active = "power_generators:combustion_engine_6c_active",
       
       node_description = S("Combustion engine"),
-    	node_help = S("Can be greased.").."\n"..S("Use this for generate shaft power up to @1.", "283k").."\n"..S("Fuel supply open and close by punch.").."\n"..S("Place fuel tank on top."),
+    	node_help = S("Use this for generate shaft power up to @1.", "323M").."\n"..S("Fuel supply open and close by punch.").."\n"..S("Can be greased.").."\n"..S("Place fuel tank on top."),
       
       input_stack_size = 0,
       have_input = false,
@@ -64,7 +64,7 @@ power_generators.combustion_engine_6c = appliances.appliance:new(
       _coef1 = 35.4931*2.5,
       _coef2 = -0.0054*2.5,
       -- -0.0054*x*x+35.4931*x-1768.3608 , rpm > 200 to start
-      -- up to T = 56 000
+      -- up to T = 141 000
       _fuel_per_rpm = 6e-6,
       
       _qgrease_max = 2,

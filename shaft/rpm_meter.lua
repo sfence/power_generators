@@ -54,17 +54,37 @@ local rpm_meter = power_generators.rpm_meter
 
 rpm_meter:power_data_register(
   {
+    ["no_power"] = {
+        disable = {}
+      },
     ["LV_power"] = {
         demand = 25,
         run_speed = 1,
-        disable = {}
+        disable = {"no_power"}
       },
     ["power_generators_electric_power"] = {
         demand = 25,
         run_speed = 1,
-        disable = {}
+        disable = {"no_power"}
+      },
+    ["elepower_power"] = {
+        demand = 2,
+        run_speed = 1,
+        disable = {"no_power"}
+      },
+    ["techage_electric_power"] = {
+        demand = 10,
+        run_speed = 1,
+        disable = {"no_power"}
+      },
+    ["factory_power"] = {
+        demand = 1,
+        run_speed = 1,
+        disable = {"no_power"}
       },
   })
+
+rpm_meter.node_help = S("Connect to power (@1).", rpm_meter:get_power_help()).."\n"..rpm_meter.node_help
 
 --------------
 -- Formspec --

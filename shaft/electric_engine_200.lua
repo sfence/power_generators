@@ -16,7 +16,7 @@ power_generators.electric_engine_200 = appliances.appliance:new(
       node_name_active = "power_generators:electric_engine_200_active",
       
       node_description = S("Electric engine"),
-    	node_help = S("Use this for generata shaft torque.").."\n"..S("Startup and Shutdown by punch.").."\n"..S("Can be greased."),
+    	node_help = S("Use this for generate shaft power up to @1.", "40M").."\n"..S("Startup and Shutdown by punch.").."\n"..S("Can be greased."),
       
       input_stack_size = 0,
       have_input = false,
