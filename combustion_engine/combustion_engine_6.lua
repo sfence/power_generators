@@ -15,6 +15,29 @@ local S = power_generators.translator;
 
 local _shaft_sides = {"front"}
 
+local engine_sound = {
+    sound = "power_generators_combustion_engine_6c_running",
+    sound_param = {max_hear_distance = 32, gain = 1, pitch = 1},
+    update_sound = function(self, pos, meta, old_state, new_state, sound)
+      local rpm = meta:get_int("L")/meta:get_int("Isum")
+      local new_sound = {
+        sound = sound.sound,
+        sound_param = table.copy(sound.sound_param),
+      }
+      if rpm<300 then
+        new_sound.sound = "power_generators_combustion_engine_6c_lowrpm"
+        new_sound.sound_param.gain = rpm*0.04
+        new_sound.sound_param.pitch = math.min(0.2+rpm*0.003, 1.1)
+        --print("lowrpm sound "..dump(new_sound))
+      else
+        new_sound.sound_param.gain = 5+rpm*0.005
+        new_sound.sound_param.pitch = math.min(0.2+rpm*0.00016, 1.1)
+        --print("normal run sound "..dump(new_sound))
+      end
+      return new_sound
+    end,
+  }
+
 power_generators.combustion_engine_6c = appliances.appliance:new(
     {
       node_name_inactive = "power_generators:combustion_engine_6c",
@@ -34,37 +57,22 @@ power_generators.combustion_engine_6c = appliances.appliance:new(
       have_control = true,
       
       _shaft_sides = _shaft_sides,
-      _friction = 20,
+      _friction = 10,
       _I = 150,
       -- maxP per step is (maxT/I)*I
-      _coef0 = -1768.3608,
-      _coef1 = 35.4931,
-      _coef2 = -0.0054,
+      _coef0 = -1768.3608*2.5,
+      _coef1 = 35.4931*2.5,
+      _coef2 = -0.0054*2.5,
       -- -0.0054*x*x+35.4931*x-1768.3608 , rpm > 200 to start
       -- up to T = 56 000
       _fuel_per_rpm = 6e-6,
       
+      _qgrease_max = 2,
+      _qgrease_eff = 1,
+      
       sounds = {
-        active_running = {
-          sound = "power_generators_combustion_engine_6c_startup",
-          sound_param = {max_hear_distance = 32, gain = 1},
-          repeat_timer = 3,
-        },
-        waiting_running = {
-          sound = "power_generators_combustion_engine_6c_startup",
-          sound_param = {max_hear_distance = 32, gain = 1},
-          repeat_timer = 3,
-        },
-        running = {
-          sound = "power_generators_combustion_engine_6c_running",
-          sound_param = {max_hear_distance = 32, gain = 1},
-          repeat_timer = 1,
-        },
+        running = engine_sound,
         running_idle = {
-          sound = "power_generators_combustion_engine_6c_shutdown",
-          sound_param = {max_hear_distance = 32, gain = 1},
-        },
-        running_nopower = {
           sound = "power_generators_combustion_engine_6c_shutdown",
           sound_param = {max_hear_distance = 32, gain = 1},
         },
@@ -108,13 +116,16 @@ function combustion_engine_6c:get_formspec(meta, production_percent, consumption
   local formspec =  "formspec_version[3]" .. "size[5.75,8.5]" ..
                     "background[-1.25,-1.25;8,10;appliances_appliance_formspec.png]" ..
                     "scrollbaroptions[min=200;max=1200;smallstep=1;largestep=20]" ..
-                    bar;
+                    bar ..
+                    "label[1.5,8;"..minetest.formspec_escape(S("Throttle @1", throttle)).."]";
   return formspec;
 end
 
 ---------------
 -- Callbacks --
 ---------------
+
+power_generators.set_rpm_can_dig(combustion_engine_6c)
 
 function combustion_engine_6c:cb_on_construct(pos)
   local meta = minetest.get_meta(pos)
@@ -168,14 +179,104 @@ end
 local node_box = {
   type = "fixed",
   fixed = {
-    {-0.5,-0.5,-0.5,0.5,0.5,0.5},
+    {-0.5,-0.5,-0.5,-0.375,0.5,-0.375},
+    {0.375,-0.5,-0.5,0.5,0.5,-0.375},
+    {-0.375,-0.4375,-0.5,0.375,-0.3125,-0.375},
+    {-0.0625,-0.3125,-0.5,0.0625,-0.0625,0.375},
+    {-0.125,-0.25,-0.5,-0.0625,-0.125,0.375},
+    {0.0625,-0.25,-0.5,0.125,-0.125,0.375},
+    {-0.375,0.0625,-0.5,0.375,0.1875,-0.375},
+    {-0.125,-0.5,-0.375,0.125,-0.3125,0.375},
+    {-0.5,-0.4375,-0.375,-0.375,-0.3125,0.5},
+    {-0.1875,-0.4375,-0.375,-0.125,-0.0625,0.375},
+    {0.125,-0.4375,-0.375,0.1875,-0.0625,0.375},
+    {0.375,-0.4375,-0.375,0.5,-0.3125,0.5},
+    {-0.25,-0.375,-0.375,-0.1875,-0.125,0.375},
+    {0.1875,-0.375,-0.375,0.25,-0.125,0.375},
+    {-0.125,-0.3125,-0.375,-0.0625,-0.25,0.375},
+    {0.0625,-0.3125,-0.375,0.125,-0.25,0.375},
+    {-0.125,-0.125,-0.375,-0.0625,0.0,0.375},
+    {0.0625,-0.125,-0.375,0.125,0.0,0.375},
+    {-0.0625,-0.0625,-0.375,0.0625,0.0,0.375},
+    {-0.5,0.0625,-0.375,-0.375,0.1875,0.5},
+    {0.375,0.0625,-0.375,0.5,0.1875,0.5},
+    {-0.0625,0.125,-0.375,0.0625,0.1875,0.5},
+    {-0.125,0.1875,-0.375,-0.0625,0.3125,0.375},
+    {0.0625,0.1875,-0.375,0.125,0.3125,0.375},
+    {-0.0625,0.3125,-0.375,0.0625,0.375,0.1875},
+    {-0.3125,-0.1875,-0.3125,-0.25,0.375,0.3125},
+    {0.25,-0.1875,-0.3125,0.3125,0.375,0.1875},
+    {-0.25,-0.125,-0.3125,-0.1875,0.375,0.3125},
+    {0.1875,-0.125,-0.3125,0.25,0.375,0.3125},
+    {-0.3125,-0.3125,-0.25,-0.25,-0.1875,-0.125},
+    {0.25,-0.3125,-0.25,0.3125,-0.1875,-0.125},
+    {-0.375,-0.1875,-0.25,-0.3125,0.375,-0.125},
+    {0.3125,-0.1875,-0.25,0.375,0.375,-0.125},
+    {-0.1875,-0.0625,-0.25,-0.125,0.375,-0.125},
+    {0.125,-0.0625,-0.25,0.1875,0.375,-0.125},
+    {-0.0625,0.0,-0.25,0.0625,0.125,0.375},
+    {-0.3125,0.375,-0.25,-0.1875,0.4375,-0.125},
+    {0.1875,0.375,-0.25,0.3125,0.4375,-0.125},
+    {-0.125,0.0,-0.1875,-0.0625,0.125,0.375},
+    {0.0625,0.0,-0.1875,0.125,0.125,-0.125},
+    {-0.4375,0.3125,-0.1875,-0.375,0.375,0.25},
+    {-0.125,0.3125,-0.1875,-0.0625,0.375,0.3125},
+    {0.0625,0.3125,-0.1875,0.125,0.375,0.3125},
+    {0.375,0.3125,-0.1875,0.4375,0.375,0.25},
+    {0.0625,0.0625,-0.125,0.125,0.125,0.5},
+    {-0.3125,-0.3125,-0.0625,-0.25,-0.1875,0.0625},
+    {0.25,-0.3125,-0.0625,0.3125,-0.1875,0.0625},
+    {-0.375,-0.1875,-0.0625,-0.3125,0.375,0.0625},
+    {0.3125,-0.1875,-0.0625,0.375,0.375,0.0625},
+    {-0.1875,-0.0625,-0.0625,-0.125,0.375,0.0625},
+    {0.125,-0.0625,-0.0625,0.1875,0.375,0.0625},
+    {0.0625,0.0,-0.0625,0.125,0.0625,0.0625},
+    {-0.3125,0.375,-0.0625,-0.1875,0.4375,0.0625},
+    {0.1875,0.375,-0.0625,0.3125,0.4375,0.0625},
+    {-0.125,0.125,0.0625,-0.0625,0.1875,0.5},
+    {0.0625,0.125,0.0625,0.125,0.1875,0.5},
+    {-0.0625,0.1875,0.0625,0.0625,0.3125,0.375},
+    {-0.3125,-0.3125,0.125,-0.25,-0.1875,0.25},
+    {0.25,-0.3125,0.125,0.3125,-0.1875,0.25},
+    {-0.375,-0.1875,0.125,-0.3125,0.375,0.25},
+    {0.3125,-0.1875,0.125,0.375,0.375,0.25},
+    {-0.1875,-0.0625,0.125,-0.125,0.375,0.25},
+    {0.125,-0.0625,0.125,0.1875,0.375,0.25},
+    {0.0625,0.0,0.125,0.125,0.0625,0.375},
+    {-0.3125,0.375,0.125,-0.1875,0.4375,0.25},
+    {-0.0625,0.375,0.125,0.0625,0.5,0.1875},
+    {0.1875,0.375,0.125,0.3125,0.4375,0.25},
+    {0.25,-0.125,0.1875,0.3125,0.375,0.3125},
+    {-0.125,0.375,0.1875,-0.0625,0.5,0.3125},
+    {0.0625,0.375,0.1875,0.125,0.5,0.3125},
+    {0.25,-0.1875,0.25,0.3125,-0.125,0.3125},
+    {-0.375,0.3125,0.25,-0.3125,0.375,0.3125},
+    {0.3125,0.3125,0.25,0.375,0.375,0.3125},
+    {-0.1875,0.25,0.3125,-0.125,0.3125,0.375},
+    {0.125,0.25,0.3125,0.1875,0.3125,0.375},
+    {-0.3125,0.3125,0.3125,-0.1875,0.375,0.375},
+    {-0.0625,0.3125,0.3125,0.0625,0.5,0.375},
+    {0.1875,0.3125,0.3125,0.3125,0.375,0.375},
+    {-0.5,-0.5,0.375,-0.375,-0.4375,0.5},
+    {0.375,-0.5,0.375,0.5,-0.4375,0.5},
+    {-0.375,-0.4375,0.375,0.375,-0.3125,0.5},
+    {-0.5,-0.3125,0.375,-0.375,0.0625,0.5},
+    {0.375,-0.3125,0.375,0.5,0.0625,0.5},
+    {-0.375,0.0625,0.375,0.0625,0.125,0.5},
+    {0.125,0.0625,0.375,0.375,0.1875,0.5},
+    {-0.375,0.125,0.375,-0.125,0.1875,0.5},
+    {-0.5,0.1875,0.375,-0.375,0.5,0.5},
+    {-0.125,0.1875,0.375,-0.0625,0.25,0.5},
+    {0.0625,0.1875,0.375,0.125,0.25,0.5},
+    {0.375,0.1875,0.375,0.5,0.5,0.5},
+    {-0.0625,0.25,0.375,0.0625,0.3125,0.5},
   },
 }
 
 local node_def = {
     paramtype = "light",
     paramtype2 = "facedir",
-    groups = {cracky = 2, shaft = 1},
+    groups = {cracky = 2, shaft = 1, greasable = 1},
     legacy_facedir_simple = true,
     is_ground_content = false,
     sounds = node_sounds,
@@ -184,6 +285,8 @@ local node_def = {
     use_texture_alpha = "clip",
     collision_box = node_box,
     selection_box = node_box,
+    
+    _inspect_msg_func = power_generators.grease_inspect_msg,
     
     _shaft_sides = _shaft_sides,
     
@@ -205,8 +308,7 @@ local node_inactive = {
         "power_generators_frame_steel.png",
         "power_generators_shaft_steel.png",
         "power_generators_body_steel.png",
-        "power_generators_pipes.png",
-        "power_generators_combustion_engine_6c_moving_parts.png",
+        "power_generators_ce_pipes.png",
     },
   }
 
@@ -215,17 +317,7 @@ local node_active = {
         "power_generators_frame_steel.png",
         "power_generators_shaft_steel.png",
         "power_generators_body_steel.png",
-        "power_generators_pipes.png",
-        {
-          image = "power_generators_combustion_engine_6c_moving_parts_active.png",
-          backface_culling = false,
-          animation = {
-            type = "vertical_frames",
-            aspect_w = 16,
-            aspect_h = 16,
-            length = 1.5
-          }
-        }
+        "power_generators_ce_pipes.png",
     },
   }
 

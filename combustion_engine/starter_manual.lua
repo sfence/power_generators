@@ -9,6 +9,22 @@ local S = power_generators.translator;
 
 local _shaft_sides = {"bottom"}
 
+local starter_sound = {
+    sound = "power_generators_starter_manual_running",
+    sound_param = {max_hear_distance = 16, gain = 1, pitch = 1},
+    update_sound = function(self, pos, meta, old_state, new_state, sound)
+      local rpm = meta:get_int("L")/meta:get_int("Isum")
+      local new_sound = {
+        sound = sound.sound,
+        sound_param = table.copy(sound.sound_param),
+      }
+      new_sound.sound_param.gain = rpm*0.2
+      new_sound.sound_param.pitch = math.min(0.2+rpm*0.016, 1.1)
+      --print("rpm: "..rpm)
+      return new_sound
+    end,
+  }
+
 power_generators.starter_manual = appliances.appliance:new(
     {
       node_name_inactive = "power_generators:starter_manual",
@@ -33,34 +49,12 @@ power_generators.starter_manual = appliances.appliance:new(
       _maxT = 250*5,
       _coef = 1*5,
       
+      _qgrease_max = 1.5,
+      _qgrease_eff = 1,
+      
       sounds = {
-        active_running = {
-          sound = "power_generators_starter_manual_startup",
-          sound_param = {max_hear_distance = 32, gain = 1},
-          repeat_timer = 3,
-        },
-        waiting_running = {
-          sound = "power_generators_starter_manual_startup",
-          sound_param = {max_hear_distance = 32, gain = 1},
-          repeat_timer = 3,
-        },
-        running = {
-          sound = "power_generators_starter_manual_running",
-          sound_param = {max_hear_distance = 32, gain = 1},
-          repeat_timer = 1,
-        },
-        running_idle = {
-          sound = "power_generators_starter_manual_shutdown",
-          sound_param = {max_hear_distance = 32, gain = 1},
-        },
-        running_nopower = {
-          sound = "power_generators_starter_manual_shutdown",
-          sound_param = {max_hear_distance = 32, gain = 1},
-        },
-        running_waiting = {
-          sound = "power_generators_starter_manual_shutdown",
-          sound_param = {max_hear_distance = 32, gain = 1},
-        },
+        running = starter_sound,
+        nopower = starter_sound,
       },
     })
 
@@ -84,34 +78,14 @@ if minetest.get_modpath("hades_core") then
 end
 
 function starter_manual:get_formspec(meta, production_percent, consumption_percent)
-  local progress = "";
-  
-  progress = "image[3.6,0.9;5.5,0.95;appliances_consumption_progress_bar.png^[transformR270]]";
-  if consumption_percent then
-    progress = "image[3.6,0.9;5.5,0.95;appliances_consumption_progress_bar.png^[lowpart:" ..
-            (consumption_percent) ..
-            ":appliances_consumption_progress_bar_full.png^[transformR270]]";
-  end
-  
-  
-  
-  local formspec =  "formspec_version[3]" .. "size[12.75,8.5]" ..
-                    "background[-1.25,-1.25;15,10;appliances_appliance_formspec.png]" ..
-                    progress..
-                    player_inv ..
-                    "list[context;"..self.use_stack..";2,0.8;1,1;]"..
-                    "list[context;"..self.output_stack..";9.75,0.25;2,2;]" ..
-                    "listring[current_player;main]" ..
-                    "listring[context;"..self.use_stack.."]" ..
-                    "listring[current_player;main]" ..
-                    "listring[context;"..self.output_stack.."]" ..
-                    "listring[current_player;main]";
-  return formspec;
+  return "";
 end
 
 ---------------
 -- Callbacks --
 ---------------
+
+power_generators.set_rpm_can_dig(starter_manual)
 
 function starter_manual:cb_on_construct(pos)
   local meta = minetest.get_meta(pos)
@@ -162,91 +136,25 @@ end
 local node_box = {
   type = "fixed",
   fixed = {
-    {-0.0625,-0.0625,-0.5,0.0625,0.0625,-0.4375},
-    {-0.3125,-0.5,-0.4375,0.3125,-0.4375,-0.375},
-    {-0.375,-0.4375,-0.4375,-0.3125,0.125,-0.375},
-    {0.3125,-0.4375,-0.4375,0.375,0.125,-0.375},
-    {0.0,-0.0625,-0.4375,0.0625,0.0625,0.5},
-    {-0.3125,0.0,-0.4375,0.0,0.0625,0.4375},
-    {0.0625,0.0,-0.4375,0.3125,0.0625,0.4375},
-    {-0.3125,0.125,-0.4375,0.3125,0.1875,-0.375},
-    {-0.375,-0.5,-0.375,-0.3125,-0.4375,0.375},
-    {0.3125,-0.5,-0.375,0.375,-0.4375,0.375},
-    {0.0625,-0.4375,-0.375,0.25,-0.125,-0.3125},
-    {-0.1875,-0.375,-0.375,-0.0625,-0.25,0.4375},
-    {0.25,-0.1875,-0.375,0.375,-0.125,-0.3125},
-    {0.0,-0.125,-0.375,0.0625,-0.0625,-0.25},
-    {-0.375,0.0,-0.375,-0.3125,0.0625,0.4375},
-    {0.3125,0.0,-0.375,0.375,0.0625,0.4375},
-    {-0.25,-0.4375,-0.3125,0.0,-0.375,0.0},
-    {0.0625,-0.4375,-0.3125,0.25,-0.1875,-0.25},
-    {-0.25,-0.375,-0.3125,-0.1875,-0.1875,0.0},
-    {-0.0625,-0.375,-0.3125,0.0,0.0,-0.25},
-    {-0.1875,-0.25,-0.3125,-0.0625,-0.1875,0.375},
-    {-0.25,-0.0625,-0.3125,-0.0625,0.0,0.3125},
-    {0.0625,-0.0625,-0.3125,0.25,0.0,0.3125},
-    {-0.25,0.0625,-0.3125,0.25,0.125,0.3125},
-    {-0.375,-0.4375,-0.25,-0.25,-0.375,-0.1875},
-    {-0.0625,-0.375,-0.25,0.0,-0.125,0.0},
-    {-0.0625,-0.0625,-0.25,0.0,0.0,0.3125},
-    {-0.3125,0.0625,-0.25,-0.25,0.125,0.25},
-    {0.25,0.0625,-0.25,0.3125,0.125,0.25},
-    {-0.25,0.125,-0.25,0.25,0.1875,0.25},
-    {0.0625,-0.4375,-0.1875,0.375,-0.375,-0.125},
-    {0.0,-0.375,-0.1875,0.1875,-0.3125,0.0},
-    {0.0625,-0.3125,-0.1875,0.25,-0.25,0.0},
-    {0.125,-0.25,-0.1875,0.1875,-0.1875,0.0},
-    {-0.125,-0.1875,-0.1875,-0.0625,-0.0625,-0.125},
-    {-0.0625,0.1875,-0.1875,0.0625,0.25,-0.0625},
-    {0.0,-0.4375,-0.125,0.1875,-0.375,-0.0625},
-    {0.0,-0.3125,-0.125,0.0625,-0.25,-0.0625},
-    {-0.375,-0.4375,-0.0625,-0.25,-0.375,0.0},
-    {0.0625,-0.4375,-0.0625,0.375,-0.375,0.0},
-    {0.0625,-0.25,-0.0625,0.125,-0.125,0.0},
-    {-0.3125,-0.1875,-0.0625,-0.0625,-0.125,0.0},
-    {0.0,-0.1875,-0.0625,0.0625,-0.125,0.0},
-    {0.125,-0.1875,-0.0625,0.3125,-0.125,0.0},
-    {-0.3125,-0.125,-0.0625,-0.25,0.0,0.0},
-    {0.25,-0.125,-0.0625,0.3125,0.0,0.0},
-    {-0.5,-0.0625,-0.0625,-0.3125,0.0,0.0},
-    {0.3125,-0.0625,-0.0625,0.5,0.0,0.0},
-    {-0.5,0.0,-0.0625,-0.375,0.0625,0.0},
-    {0.375,0.0,-0.0625,0.5,0.0625,0.0},
-    {-0.1875,-0.4375,0.0,-0.0625,-0.375,0.375},
-    {-0.25,-0.375,0.0,-0.1875,-0.25,0.375},
-    {-0.0625,-0.375,0.0,0.0,-0.25,0.375},
-    {0.125,-0.3125,0.0,0.1875,-0.25,0.375},
-    {0.0625,-0.25,0.0,0.125,-0.1875,0.375},
-    {-0.5,-0.0625,0.0,-0.4375,0.0625,0.0625},
-    {0.4375,-0.0625,0.0,0.5,0.0625,0.0625},
-    {-0.375,-0.4375,0.0625,-0.1875,-0.375,0.125},
-    {0.125,-0.4375,0.0625,0.375,-0.375,0.125},
-    {0.0625,-0.375,0.0625,0.25,-0.3125,0.375},
-    {0.0625,-0.3125,0.0625,0.125,-0.25,0.375},
-    {0.1875,-0.3125,0.0625,0.25,-0.25,0.375},
-    {0.125,-0.25,0.0625,0.1875,-0.1875,0.375},
-    {0.125,-0.4375,0.125,0.1875,-0.375,0.375},
-    {-0.1875,-0.5,0.3125,-0.0625,-0.4375,0.4375},
-    {0.125,-0.5,0.3125,0.1875,-0.4375,0.4375},
-    {-0.375,-0.25,0.3125,-0.1875,-0.1875,0.375},
-    {0.0,-0.25,0.3125,0.0625,-0.0625,0.375},
-    {0.1875,-0.25,0.3125,0.375,-0.1875,0.375},
-    {-0.3125,-0.5,0.375,-0.1875,-0.4375,0.4375},
-    {-0.0625,-0.5,0.375,0.125,-0.4375,0.4375},
-    {0.1875,-0.5,0.375,0.3125,-0.4375,0.4375},
-    {-0.375,-0.4375,0.375,-0.3125,0.0,0.4375},
-    {0.3125,-0.4375,0.375,0.375,0.0,0.4375},
-    {-0.375,0.0625,0.375,-0.3125,0.125,0.4375},
-    {0.3125,0.0625,0.375,0.375,0.125,0.4375},
-    {-0.3125,0.125,0.375,0.3125,0.1875,0.4375},
-    {-0.0625,-0.0625,0.4375,0.0,0.0625,0.5},
+    {-0.0625,-0.25,-0.0625,0.25,-0.1875,0.0},
+    {0.1875,-0.1875,-0.0625,0.25,-0.125,0.0},
+    {-0.0625,-0.25,0.0,0.0,-0.1875,0.4375},
+    {-0.1875,-0.5,0.0625,0.1875,-0.25,0.375},
+    {-0.1875,-0.25,0.0625,-0.0625,-0.0625,0.375},
+    {0.0,-0.25,0.0625,0.1875,-0.0625,0.375},
+    {-0.0625,-0.1875,0.0625,0.0,-0.0625,0.375},
+    {-0.4375,-0.5,0.25,-0.3125,-0.0625,0.375},
+    {0.3125,-0.5,0.25,0.4375,-0.125,0.375},
+    {-0.4375,-0.25,0.375,-0.0625,-0.125,0.4375},
+    {0.0,-0.25,0.375,0.4375,-0.125,0.4375},
+    {-0.0625,-0.1875,0.375,0.0,-0.125,0.4375},
   },
 }
 
 local node_def = {
     paramtype = "light",
     paramtype2 = "facedir",
-    groups = {cracky = 2, shaft = 1},
+    groups = {cracky = 2, shaft = 1, greasable = 1},
     legacy_facedir_simple = true,
     is_ground_content = false,
     sounds = node_sounds,
@@ -256,22 +164,23 @@ local node_def = {
     collision_box = node_box,
     selection_box = node_box,
     
+    _inspect_msg_func = power_generators.grease_inspect_msg,
+    
     _shaft_sides = _shaft_sides,
  }
 
 local node_inactive = {
     tiles = {
         "power_generators_frame_steel.png",
-        "power_generators_shaft_steel.png",
         "power_generators_body_steel.png",
         "power_generators_starter_manual_moving_parts.png",
     },
   }
 
 local node_active = {
+    mesh = "power_generators_ce_starter_manual_active.obj",
     tiles = {
         "power_generators_frame_steel.png",
-        "power_generators_shaft_steel.png",
         "power_generators_body_steel.png",
         {
           image = "power_generators_starter_manual_moving_parts_active.png",
@@ -291,59 +200,4 @@ starter_manual:register_nodes(node_def, node_inactive, node_active)
 -------------------------
 -- Recipe Registration --
 -------------------------
-
-local items = {
-  phial_fuel = "biofuel:phial_fuel",
-  phial_empty = "biofuel:phial",
-  bottle_fuel = "biofuel:bottle_fuel",
-  bottle_empty = "vessels:glass_bottle",
-  can_fuel = "biofuel:fuel_can",
-  can_empty = "biofuel:can",
-}
-
-if minetest.get_modpath("hades_biofuel") then
-  items.phial_fuel = "hades_biofuel:phial_fuel"
-  items.phial_empty = "hades_biofuel:phial"
-  items.bottle_fuel = "hades_biofuel:bottle_fuel"
-  items.bottle_empty = "vessels:glass_bottle"
-  items.can_fuel = "hades_biofuel:fuel_can"
-  items.can_empty = "hades_biofuel:can"
-end
-
--- hope, temporary only support for biofuel withou vessels manageent
-if not minetest.registered_items[items.phial_empty] then
-  items.phial_empty = nil
-  items.bottle_empty = nil
-  items.can_empty = nil
-end
-
-starter_manual:recipe_register_usage(
-	items.phial_fuel,
-	{
-		inputs = 1,
-		outputs = {items.phial_empty},
-		consumption_time = 2,
-		consumption_step_size = 1,
-    generator_output = 150,
-	});
-starter_manual:recipe_register_usage(
-	items.bottle_fuel,
-	{
-		inputs = 1,
-		outputs = {items.bottle_empty},
-		consumption_time = 20,
-		consumption_step_size = 1,
-    generator_output = 150,
-	});
-starter_manual:recipe_register_usage(
-	items.can_fuel,
-	{
-		inputs = 1,
-		outputs = {items.can_empty},
-		consumption_time = 160,
-		consumption_step_size = 1,
-    generator_output = 150,
-	});
-
-starter_manual:register_recipes("", "power_generators_fuel")
 

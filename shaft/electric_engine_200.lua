@@ -39,19 +39,33 @@ power_generators.electric_engine_200 = appliances.appliance:new(
       
       sounds = {
         active_running = {
-          sound = "power_generators_electric_engine_200_running",
+          sound = "power_generators_electric_engine_startup",
           sound_param = {max_hear_distance = 16, gain = 1},
-          repeat_timer = 3,
         },
         waiting_running = {
-          sound = "power_generators_electric_engine_200_running",
+          sound = "power_generators_electric_engine_startup",
           sound_param = {max_hear_distance = 16, gain = 1},
-          repeat_timer = 3,
+        },
+        nopower_running = {
+          sound = "power_generators_electric_engine_startup",
+          sound_param = {max_hear_distance = 16, gain = 1},
         },
         running = {
-          sound = "power_generators_electric_engine_200_running",
+          sound = "power_generators_electric_engine_running",
+          sound_param = {max_hear_distance = 16, gain = 1, loop = true},
+          key = "running",
+        },
+        running_idle = {
+          sound = "power_generators_electric_engine_shutdown",
           sound_param = {max_hear_distance = 16, gain = 1},
-          repeat_timer = 1,
+        },
+        running_nopower = {
+          sound = "power_generators_electric_engine_shutdown",
+          sound_param = {max_hear_distance = 16, gain = 1},
+        },
+        running_waiting = {
+          sound = "power_generators_electric_engine_shutdown",
+          sound_param = {max_hear_distance = 16, gain = 1},
         },
       },
     })
@@ -136,6 +150,8 @@ end
 ---------------
 -- Callbacks --
 ---------------
+
+power_generators.set_rpm_can_dig(electric_engine_200)
 
 function electric_engine_200:cb_on_construct(pos)
   local meta = minetest.get_meta(pos)

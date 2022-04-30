@@ -391,3 +391,22 @@ function power_generators.grease_inspect_msg(data, level)
   end
 end
 
+function power_generators.rpm_can_dig(self, pos, player)
+  local meta = minetest.get_meta(pos)
+  if meta:get_int("L")>0 then
+    if player then
+      local player_name = player:get_player_name()
+      if player_name~="" then
+        minetest.chat_send_player(player_name, S("It is rotating! Can't be digged!"))
+      end
+    end
+    return false
+  end
+  return self:cb_can_dig_orig(pos, player)
+end
+
+function power_generators.set_rpm_can_dig(self)
+  self.cb_can_dig_orig = self.cb_can_dig
+  self.cb_can_dig = power_generators.rpm_can_dig
+end
+

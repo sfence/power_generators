@@ -73,6 +73,8 @@ end
 -- Callbacks --
 ---------------
 
+power_generators.set_rpm_can_dig(shaft_verFront)
+
 function shaft_verFront:cb_on_construct(pos)
   local meta = minetest.get_meta(pos)
   meta:set_string(self.meta_infotext, self.node_description)

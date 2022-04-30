@@ -21,7 +21,6 @@ function power_generators.ce_gearbox_shifting(self, pos, node, meta)
     meta:set_float(self._engine_side.."_engine", 0)
     local starter_pos = appliances.get_side_pos(pos, node, self._starter_side)
   else -- neutral
-    meta:set_float("minT", 0)
     meta:set_float(self._shaft_side.."_ratio", 0)
     meta:set_float(self._starter_side.."_ratio", 0)
     meta:set_float(self._shaft_side.."_engine", 0)
@@ -30,6 +29,9 @@ function power_generators.ce_gearbox_shifting(self, pos, node, meta)
   end
   
   -- engine check?
+  meta:set_int("minT", 0)
+  meta:set_int("Isum", meta:get_int("I"))
+  meta:set_string("update", 1)
 end
 
 function power_generators.ce_get_torque(self, pos, meta, rpm, I, speed)
@@ -49,6 +51,7 @@ function power_generators.ce_get_torque(self, pos, meta, rpm, I, speed)
       else
         T = T * post_effect*post_effect
       end
+      --print("ce torque: "..T.." om rpm: "..rpm)
       return math.max(T, 0)
     end
   end

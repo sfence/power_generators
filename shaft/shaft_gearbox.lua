@@ -34,20 +34,20 @@ power_generators.shaft_gearbox = appliances.appliance:new(
       _qgrease_eff = 5,
       
       sounds = {
-        active_running = {
-          sound = "power_generators_shaft_gearbox_running",
-          sound_param = {max_hear_distance = 16, gain = 1},
-          repeat_timer = 3,
-        },
-        waiting_running = {
-          sound = "power_generators_shaft_gearbox_running",
-          sound_param = {max_hear_distance = 16, gain = 1},
-          repeat_timer = 3,
-        },
         running = {
           sound = "power_generators_shaft_gearbox_running",
           sound_param = {max_hear_distance = 16, gain = 1},
           repeat_timer = 1,
+          update_sound = function(self, pos, meta, old_state, new_state, sound)
+            local rpm = meta:get_int("L")/meta:get_int("Isum")
+            local new_sound = {
+              sound = sound.sound,
+              sound_param = table.copy(sound.sound_param),
+            }
+            new_sound.sound_param.gain = math.sqrt(rpm)*0.05
+            new_sound.sound_param.pitch = 0.2+rpm*0.016
+            return new_sound
+          end,
         },
       },
     })
@@ -91,6 +91,8 @@ end
 ---------------
 -- Callbacks --
 ---------------
+
+power_generators.set_rpm_can_dig(shaft_gearbox)
 
 function shaft_gearbox:cb_on_construct(pos)
   local meta = minetest.get_meta(pos)

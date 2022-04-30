@@ -17,7 +17,7 @@ appliances.register_craft_type("power_generators_fuel", {
 dofile(modpath.."/electric/init.lua")
 dofile(modpath.."/shaft/init.lua")
 dofile(modpath.."/generators/init.lua")
---dofile(modpath.."/combustion_engine/init.lua")
+dofile(modpath.."/combustion_engine/init.lua")
 
 dofile(modpath.."/nodes.lua")
 dofile(modpath.."/craftitems.lua")
