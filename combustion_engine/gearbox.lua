@@ -15,7 +15,7 @@ power_generators.ce_gearbox = appliances.appliance:new(
       node_name_active = "power_generators:gearbox_active",
       
       node_description = S("Gearbox for Combustion Engine with External Starter"),
-    	node_help = S("Can be greased.").."\n"..S("Change gear by punch (neutral/shaft/starter).").."\n"..S("Place starter on top."),
+      node_help = S("Can be greased.").."\n"..S("Change gear by punch (neutral/shaft/starter).").."\n"..S("Place starter on top."),
       
       input_stack_size = 0,
       have_input = false,
@@ -41,7 +41,8 @@ power_generators.ce_gearbox = appliances.appliance:new(
         running = {
           sound = "power_generators_gearbox_running",
           sound_param = {max_hear_distance = 32, gain = 2},
-          update_sound = function(self, pos, meta, old_state, new_state, sound)
+          --update_sound = function(self, pos, meta, old_state, new_state, sound)
+          update_sound = function(self, _, meta, _, _, sound)
             local rpm = meta:get_int("L")/meta:get_int("Isum")
             local new_sound = {
               sound = sound.sound,
@@ -71,7 +72,8 @@ local next_shifting = {
 ce_gearbox:control_data_register(
   {
     ["template_control"] = {
-        on_punch = function(self, control, pos, node, puncher, pointed_thing)
+        --on_punch = function(self, control, pos, node, puncher, pointed_thing)
+        on_punch = function(self, _, pos, node)
           local meta = minetest.get_meta(pos)
           local shifting = meta:get_string("shifting")
           shifting = next_shifting[shifting]
@@ -96,8 +98,9 @@ if minetest.get_modpath("hades_core") then
    player_inv = "list[current_player;main;0.5,3.5;10,4;]";
 end
 
-function ce_gearbox:get_formspec(meta, production_percent, consumption_percent)
-  local progress = "";
+--function ce_gearbox:get_formspec(meta, production_percent, consumption_percent)
+function ce_gearbox:get_formspec(_meta, _, consumption_percent)
+  local progress;
   
   progress = "image[3.6,0.9;5.5,0.95;appliances_consumption_progress_bar.png^[transformR270]]";
   if consumption_percent then
@@ -134,7 +137,8 @@ local shifting_text = {
   ["shaft"] = S("Shaft"),
 }
 
-function ce_gearbox:get_infotext(pos, meta, state)
+--function ce_gearbox:get_infotext(pos, meta, state)
+function ce_gearbox:get_infotext(_, meta)
   return self.node_description.." - "..shifting_text[meta:get_string("shifting")]
 end
 

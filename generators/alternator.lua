@@ -15,7 +15,7 @@ power_generators.alternator = appliances.appliance:new(
       node_name_active = "power_generators:alternator_active",
       
       node_description = S("Alternator"),
-    	node_help = S("Use this for generate energy PG EU depend on rpm."),
+      node_help = S("Use this for generate energy PG EU depend on rpm."),
       
       input_stack_size = 0,
       have_input = false,
@@ -79,7 +79,8 @@ alternator:power_data_register(
 -- Formspec --
 --------------
 
-function alternator:get_formspec(meta, production_percent, consumption_percent)
+--function alternator:get_formspec(meta, production_percent, consumption_percent)
+function alternator:get_formspec()
   return ""
 end
 
@@ -103,11 +104,13 @@ function alternator:cb_on_production(timer_step)
   power_generators.update_generator_supply(self.out_power_connect_sides, timer_step.pos, use_usage)
 end
 
-function alternator:cb_waiting(pos, meta)
+--function alternator:cb_waiting(pos, meta)
+function alternator:cb_waiting(pos)
   power_generators.update_generator_supply(self.out_power_connect_sides, pos, nil)
 end
 
-function alternator:cb_deactivate(pos, meta)
+--function alternator:cb_deactivate(pos, meta)
+function alternator:cb_deactivate(pos)
   power_generators.update_generator_supply(self.out_power_connect_sides, pos, nil)
 end
 

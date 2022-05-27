@@ -15,7 +15,7 @@ power_generators.shaft_horTop = appliances.appliance:new(
       node_name_active = "power_generators:shaft_horTop_active",
       
       node_description = S("Shaft Horizontal With Top Branch"),
-    	node_help = S("Can be greased."),
+      node_help = S("Can be greased."),
       
       input_stack_size = 0,
       have_input = false,
@@ -65,7 +65,7 @@ shaft_horTop:power_data_register(
 -- Formspec --
 --------------
 
-function shaft_horTop:get_formspec(meta, production_percent, consumption_percent)
+function shaft_horTop:get_formspec()
   return "";
 end
 
@@ -87,7 +87,8 @@ function shaft_horTop:cb_on_construct(pos)
   self:call_on_construct(pos, meta)
 end
 
-function shaft_horTop:get_infotext(pos, meta, state)
+--function shaft_horTop:get_infotext(pos, meta, state)
+function shaft_horTop:get_infotext(_, _, state)
   if state=="running" then
     return self.node_description.." - "..S("working")
   else

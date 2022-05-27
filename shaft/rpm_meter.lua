@@ -15,7 +15,7 @@ power_generators.rpm_meter = appliances.appliance:new(
       node_name_active = "power_generators:rpm_meter_active",
       
       node_description = S("Shaft RPM Meter"),
-    	node_help = S("Connect to power (@1).", "25 EU").."\n"..S("Can be greased."),
+      node_help = S("Connect to power (@1).", "25 EU").."\n"..S("Can be greased."),
       
       input_stack_size = 0,
       have_input = false,
@@ -90,7 +90,7 @@ rpm_meter.node_help = S("Connect to power (@1).", rpm_meter:get_power_help()).."
 -- Formspec --
 --------------
 
-function rpm_meter:get_formspec(meta, production_percent, consumption_percent)
+function rpm_meter:get_formspec()
   return "";
 end
 
@@ -111,7 +111,8 @@ function rpm_meter:cb_on_construct(pos)
   self:call_on_construct(pos, meta)
 end
 
-function rpm_meter:get_infotext(pos, meta, state)
+--function rpm_meter:get_infotext(pos, meta, state)
+function rpm_meter:get_infotext(_, meta, state)
   if state=="running" then
     local I = meta:get_int("Isum")
     local rpm = meta:get_int("L")/I

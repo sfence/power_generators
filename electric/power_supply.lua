@@ -30,10 +30,12 @@ local power_supply = {
         local demand = power_data.demand or power_data.get_demand(self, pos, meta)
         meta:set_int("generator_demand", demand)
       end,
-    power_idle = function (self, power_data, pos, meta)
+    --power_idle = function (self, power_data, pos, meta)
+    power_idle = function (self, _, _, meta)
         meta:set_int("generator_demand", 0)
       end,
-    update_node_def = function(self, power_data, node_def)
+    --update_node_def = function(self, power_data, node_def)
+    update_node_def = function(self, _, node_def)
         node_def.groups.generator_powered = 1;
         node_def._generator_connect_sides = self.power_connect_sides;
         node_def._generator_powered_valid_sides = {}
@@ -41,7 +43,8 @@ local power_supply = {
           node_def._generator_powered_valid_sides[tubelib2_side[side]] = true
         end
       end,
-    after_register_node = function(self, power_data)
+    --after_register_node = function(self, power_data)
+    after_register_node = function(self, _)
         local names = {self.node_name_active, self.node_name_inactive}
         if self.node_name_waiting then
           table.insert(names, self.node_name_waiting)
@@ -59,6 +62,7 @@ local power_supply = {
   }
 appliances.add_power_supply("power_generators_electric_power", power_supply)
 
+--[[
 function power_generators.need_power(pos, gen_pos)
   local node = minetest.get_node(pos);
   if (minetest.get_item_group(node.name, "generator_powered")>0) then
@@ -66,6 +70,7 @@ function power_generators.need_power(pos, gen_pos)
   end
   return 0;
 end
+--]]
 
 -- abm function
 --[[

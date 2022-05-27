@@ -15,7 +15,7 @@ power_generators.shaft_horLeft = appliances.appliance:new(
       node_name_active = "power_generators:shaft_horLeft_active",
       
       node_description = S("Shaft Horizontal With Left Branch"),
-    	node_help = S("Can be greased."),
+      node_help = S("Can be greased."),
       
       input_stack_size = 0,
       have_input = false,
@@ -65,7 +65,7 @@ shaft_horLeft:power_data_register(
 -- Formspec --
 --------------
 
-function shaft_horLeft:get_formspec(meta, production_percent, consumption_percent)
+function shaft_horLeft:get_formspec()
   return "";
 end
 
@@ -87,7 +87,8 @@ function shaft_horLeft:cb_on_construct(pos)
   self:call_on_construct(pos, meta)
 end
 
-function shaft_horLeft:get_infotext(pos, meta, state)
+--function shaft_horLeft:get_infotext(pos, meta, state)
+function shaft_horLeft:get_infotext(_, _, state)
   if state=="running" then
     return self.node_description.." - "..S("working")
   else
@@ -165,7 +166,7 @@ local node_box = {
     {0.125,0.0625,0.375,0.375,0.125,0.4375},
     {-0.4375,0.125,0.375,-0.375,0.5,0.5},
     {0.375,0.125,0.375,0.4375,0.5,0.5},
-  },  
+  },
 }
 
 local node_def = {

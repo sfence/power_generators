@@ -12,7 +12,8 @@ local _shaft_sides = {"bottom"}
 local starter_sound = {
     sound = "power_generators_starter_manual_running",
     sound_param = {max_hear_distance = 16, gain = 1, pitch = 1},
-    update_sound = function(self, pos, meta, old_state, new_state, sound)
+    --update_sound = function(self, pos, meta, old_state, new_state, sound)
+    update_sound = function(self, _, meta, _, _, sound)
       local rpm = meta:get_int("L")/meta:get_int("Isum")
       local new_sound = {
         sound = sound.sound,
@@ -31,7 +32,7 @@ power_generators.starter_manual = appliances.appliance:new(
       node_name_active = "power_generators:starter_manual_active",
       
       node_description = S("Combustion Engine Manual Starter"),
-    	node_help = S("Can be greased.").."\n"..S("Crank up starter by punching."),
+      node_help = S("Can be greased.").."\n"..S("Crank up starter by punching."),
       
       input_stack_size = 0,
       have_input = false,
@@ -72,12 +73,8 @@ starter_manual:power_data_register(
 -- Formspec --
 --------------
 
-local player_inv = "list[current_player;main;1.5,3.5;8,4;]";
-if minetest.get_modpath("hades_core") then
-   player_inv = "list[current_player;main;0.5,3.5;10,4;]";
-end
-
-function starter_manual:get_formspec(meta, production_percent, consumption_percent)
+--function starter_manual:get_formspec(meta, production_percent, consumption_percent)
+function starter_manual:get_formspec()
   return "";
 end
 

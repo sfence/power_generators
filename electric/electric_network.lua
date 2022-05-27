@@ -1,17 +1,18 @@
 local S = power_generators.translator;
 
 -- for lazy programmers
-local S2P = minetest.string_to_pos
-local P2S = minetest.pos_to_string
+--local S2P = minetest.string_to_pos
+--local P2S = minetest.pos_to_string
 
 local Cable = tubelib2.Tube:new({
   dirs_to_check = {1,2,3,4,5,6},
-  max_tube_length = 128, 
+  max_tube_length = 128,
   show_infotext = false,
   tube_type = "powgencable",
   primary_node_names = {"power_generators:electric_cableS", "power_generators:electric_cableA",
     },
-  after_place_tube = function(pos, param2, tube_type, num_tubes)
+  --after_place_tube = function(pos, param2, tube_type, num_tubes)
+  after_place_tube = function(pos, param2, tube_type)
     minetest.swap_node(pos, {name = "power_generators:electric_cable"..tube_type, param2 = param2})
   end,
 })
@@ -66,14 +67,16 @@ minetest.register_node("power_generators:electric_cableS", {
   groups = {snappy = 2, choppy = 2, oddly_breakable_by_hand = 3, power_generator_cable = 1},
   sounds = node_sounds,
   
-  after_place_node = function(pos, placer, itemstack, pointed_thing)
+  --after_place_node = function(pos, placer, itemstack, pointed_thing)
+  after_place_node = function(pos, placer, _, pointed_thing)
     if not Cable:after_place_tube(pos, placer, pointed_thing) then
       minetest.remove_node(pos)
       return true
     end
     return false
   end,
-  after_dig_node = function(pos, oldnode, oldmetadata, digger)
+  --after_dig_node = function(pos, oldnode, oldmetadata, digger)
+  after_dig_node = function(pos, oldnode, oldmetadata)
     Cable:after_dig_tube(pos, oldnode, oldmetadata)
   end,
   on_rotate = screwdriver.disallow, -- important!
@@ -104,12 +107,13 @@ minetest.register_node("power_generators:electric_cableA", {
   paramtype = "light",
   sunlight_propagates = true,
   is_ground_content = false,
-  groups = {snappy = 2, choppy = 2, oddly_breakable_by_hand = 3, 
+  groups = {snappy = 2, choppy = 2, oddly_breakable_by_hand = 3,
       techage_trowel = 1, not_in_creative_inventory = 1},
   sounds = node_sounds,
   drop = "power_generators:electric_cableS",
   
-  after_dig_node = function(pos, oldnode, oldmetadata, digger)
+  --after_dig_node = function(pos, oldnode, oldmetadata, digger)
+  after_dig_node = function(pos, oldnode)
     Cable:after_dig_tube(pos, oldnode)
   end,
   on_rotate = screwdriver.disallow, -- important!

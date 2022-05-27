@@ -16,7 +16,7 @@ power_generators.electric_engine_200 = appliances.appliance:new(
       node_name_active = "power_generators:electric_engine_200_active",
       
       node_description = S("Electric engine"),
-    	node_help = S("Use this for generate shaft power up to @1.", "40M").."\n"..S("Startup and Shutdown by punch.").."\n"..S("Can be greased."),
+      node_help = S("Use this for generate shaft power up to @1.", "40M").."\n"..S("Startup and Shutdown by punch.").."\n"..S("Can be greased."),
       
       input_stack_size = 0,
       have_input = false,
@@ -116,35 +116,8 @@ electric_engine_200.node_help = S("Connect to power (@1).", electric_engine_200:
 -- Formspec --
 --------------
 
-local player_inv = "list[current_player;main;1.5,3.5;8,4;]";
-if minetest.get_modpath("hades_core") then
-   player_inv = "list[current_player;main;0.5,3.5;10,4;]";
-end
-
-function electric_engine_200:get_formspec(meta, production_percent, consumption_percent)
-  local progress = "";
-  
-  progress = "image[3.6,0.9;5.5,0.95;appliances_consumption_progress_bar.png^[transformR270]]";
-  if consumption_percent then
-    progress = "image[3.6,0.9;5.5,0.95;appliances_consumption_progress_bar.png^[lowpart:" ..
-            (consumption_percent) ..
-            ":appliances_consumption_progress_bar_full.png^[transformR270]]";
-  end
-  
-  
-  
-  local formspec =  "formspec_version[3]" .. "size[12.75,8.5]" ..
-                    "background[-1.25,-1.25;15,10;appliances_appliance_formspec.png]" ..
-                    progress..
-                    player_inv ..
-                    "list[context;"..self.use_stack..";2,0.8;1,1;]"..
-                    "list[context;"..self.output_stack..";9.75,0.25;2,2;]" ..
-                    "listring[current_player;main]" ..
-                    "listring[context;"..self.use_stack.."]" ..
-                    "listring[current_player;main]" ..
-                    "listring[context;"..self.output_stack.."]" ..
-                    "listring[current_player;main]";
-  return formspec;
+function electric_engine_200:get_formspec()
+  return ""
 end
 
 ---------------

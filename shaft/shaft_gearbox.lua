@@ -15,7 +15,7 @@ power_generators.shaft_gearbox = appliances.appliance:new(
       node_name_active = "power_generators:shaft_gearbox_active",
       
       node_description = S("Shaft Gearbox"),
-    	node_help = S("Can be greased.").."\n"..S("Put/take gears to set gear ratio."),
+      node_help = S("Can be greased.").."\n"..S("Put/take gears to set gear ratio."),
       
       input_stack_size = 2,
       have_input = false,
@@ -38,7 +38,8 @@ power_generators.shaft_gearbox = appliances.appliance:new(
           sound = "power_generators_shaft_gearbox_running",
           sound_param = {max_hear_distance = 16, gain = 1},
           repeat_timer = 1,
-          update_sound = function(self, pos, meta, old_state, new_state, sound)
+          --update_sound = function(self, pos, meta, old_state, new_state, sound)
+          update_sound = function(self, _, meta, _, _, sound)
             local rpm = meta:get_int("L")/meta:get_int("Isum")
             local new_sound = {
               sound = sound.sound,
@@ -71,7 +72,7 @@ if minetest.get_modpath("hades_core") then
    player_inv = "list[current_player;main;0.5,3.5;10,4;]";
 end
 
-function shaft_gearbox:get_formspec(meta, production_percent, consumption_percent)
+function shaft_gearbox:get_formspec(meta)
   local inv = meta:get_inventory()
   local cnt1 = inv:get_stack(self.input_stack, 1):get_count()
   local cnt2 = inv:get_stack(self.input_stack, 2):get_count()
@@ -107,9 +108,23 @@ function shaft_gearbox:cb_on_construct(pos)
   self:call_on_construct(pos, meta)
 end
 
-function shaft_gearbox:cb_allow_metadata_inventory_put(pos, listname, index, stack, player)
+--function shaft_gearbox:cb_allow_metadata_inventory_put(pos, listname, index, stack, player)
+function shaft_gearbox:cb_allow_metadata_inventory_put(pos, listname, _, stack, player)
+  local player_name
+  if player then
+    player_name = player:get_player_name()
+  end
+  if player_name then
+    if minetest.is_protected(pos, player_name) then
+      return 0
+    end
+  end
+  
   local meta = minetest.get_meta(pos)
-  if meta:get_int("rpm")>0 then
+  if meta:get_int("L")>0 then
+    if player_name~="" then
+      minetest.chat_send_player(player_name, S("It is rotating! Can't be putten!"))
+    end
     return 0
   end
   local item_name = stack:get_name()
@@ -126,15 +141,30 @@ function shaft_gearbox:cb_allow_metadata_inventory_put(pos, listname, index, sta
   end
   return 0
 end
-function shaft_gearbox:cb_allow_metadata_inventory_take(pos, listname, index, stack, player)
+--function shaft_gearbox:cb_allow_metadata_inventory_take(pos, listname, index, stack, player)
+function shaft_gearbox:cb_allow_metadata_inventory_take(pos, _, _, stack, player)
+  local player_name
+  if player then
+    player_name = player:get_player_name()
+  end
+  if player_name then
+    if minetest.is_protected(pos, player_name) then
+      return 0
+    end
+  end
+  
   local meta = minetest.get_meta(pos)
-  if meta:get_int("rpm")>0 then
+  if meta:get_int("L")>0 then
+    if player_name~="" then
+      minetest.chat_send_player(player_name, S("It is rotating! Can't be taken!"))
+    end
     return 0
   end
   return stack:get_count()
 end
 
-function shaft_gearbox:cb_on_metadata_inventory_put(pos, listname, index, stack, player)
+--function shaft_gearbox:cb_on_metadata_inventory_put(pos, listname, index, stack, player)
+function shaft_gearbox:cb_on_metadata_inventory_put(pos, listname, _, _, _)
   local meta = minetest.get_meta(pos)
   local inv = meta:get_inventory()
     
@@ -146,7 +176,8 @@ function shaft_gearbox:cb_on_metadata_inventory_put(pos, listname, index, stack,
   meta:set_string("formspec", self:get_formspec(meta, 0, 0))
 end
 
-function shaft_gearbox:cb_on_metadata_inventory_take(pos, listname, index, stack, player)
+--function shaft_gearbox:cb_on_metadata_inventory_take(pos, listname, index, stack, player)
+function shaft_gearbox:cb_on_metadata_inventory_take(pos, listname, _, _, _)
   local meta = minetest.get_meta(pos)
   local inv = meta:get_inventory()
     

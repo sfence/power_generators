@@ -39,7 +39,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
   local I = meta:get_int("I")
   local minT = 0
   
-  local Isum = I
+  Isum = I
   local Fsum = 0
   --local Tpwr = 0
   local rpmPwr = 0
@@ -189,7 +189,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
   local new_rpm
   for _,shaft in pairs(shafts) do
     new_rpm = rpm*shaft.ratio
-    shaft.meta:set_int("L", math.floor(new_rpm*shaft.I)) 
+    shaft.meta:set_int("L", math.floor(new_rpm*shaft.I))
     if (shaft.engine_side_side==0) and (rpmPwr>0) then
       meta:set_int(shaft.side.."_engine", 1)
       --print("meta "..node.name.." "..shaft.side.."_engine: 1")
@@ -202,7 +202,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
         shaft.meta:set_float(shaft.side_side.."_Tpart", shaft.rpm/shaft.ratio/rpmPwrSum)
         --print("Tpart: "..(shaft.rpm/shaft.ratio/rpmPwrSum))
         --print("rpmPwrSum: "..rpmPwrSum)
-      else
+      --else
         --shaft.meta:set_float(shaft.side_side.."_engine", 0)
       end
     end
@@ -287,7 +287,8 @@ function power_generators.update_shaft_supply(self, pos, meta, speed)
   end
 end
 
-function power_generators.ee_get_torque(self, pos, meta, rpm, I, speed)
+--function power_generators.ee_get_torque(self, pos, meta, rpm, I, speed)
+function power_generators.ee_get_torque(self, _, _, rpm, _, speed)
   local T = self._maxT
   local maxP = self._maxP*speed
   if rpm>self._limitRpm then
@@ -342,10 +343,6 @@ function power_generators.apply_grease(itemstack, user, pointed_thing)
 end
 
 function power_generators.grease_inspect_msg(data, level)
-  local agrease
-  local qgrease
-  local acoef
-  local qcoef
   if type(data)=="table" then
     local meta = minetest.get_meta(data)
     local agrease = meta:get_float("agrease")

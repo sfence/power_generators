@@ -4,14 +4,15 @@
 -- T -> torque
 -- rpm -> revolution
 
-function power_generators.ce_gearbox_shifting(self, pos, node, meta)
+--function power_generators.ce_gearbox_shifting(self, pos, node, meta)
+function power_generators.ce_gearbox_shifting(self, _pos, _node, meta)
   local shifting = meta:get_string("shifting")
   if shifting=="shaft" then
     meta:set_float(self._shaft_side.."_ratio", 1)
     meta:set_float(self._starter_side.."_ratio", 0)
     meta:set_float(self._shaft_side.."_engine", 0)
     meta:set_float(self._starter_side.."_engine", 0)
-    local shaft_pos = appliances.get_side_pos(pos, node, self._shaft_side)
+    --local shaft_pos = appliances.get_side_pos(pos, node, self._shaft_side)
     
   elseif shifting=="starter" then
     meta:set_float(self._shaft_side.."_ratio", 0)
@@ -19,7 +20,7 @@ function power_generators.ce_gearbox_shifting(self, pos, node, meta)
     meta:set_float(self._shaft_side.."_engine", 0)
     meta:set_float(self._starter_side.."_engine", 0)
     meta:set_float(self._engine_side.."_engine", 0)
-    local starter_pos = appliances.get_side_pos(pos, node, self._starter_side)
+    --local starter_pos = appliances.get_side_pos(pos, node, self._starter_side)
   else -- neutral
     meta:set_float(self._shaft_side.."_ratio", 0)
     meta:set_float(self._starter_side.."_ratio", 0)
@@ -34,7 +35,8 @@ function power_generators.ce_gearbox_shifting(self, pos, node, meta)
   meta:set_string("update", 1)
 end
 
-function power_generators.ce_get_torque(self, pos, meta, rpm, I, speed)
+--function power_generators.ce_get_torque(self, pos, meta, rpm, I, speed)
+function power_generators.ce_get_torque(self, pos, meta, rpm)
   if rpm>0 then
     local tank_pos = appliances.get_side_pos(pos, nil, "top")
     local tank = minetest.get_node(tank_pos)
@@ -58,7 +60,9 @@ function power_generators.ce_get_torque(self, pos, meta, rpm, I, speed)
   return 0
 end
 
-function power_generators.cesm_get_torque(self, pos, meta, rpm, I, speed)
+--function power_generators.cesm_get_torque(self, pos, meta, rpm, I, speed)
+function power_generators.cesm_get_torque(self, _pos, _meta, rpm)
   local T = self._maxT-rpm*self._coef
   return math.max(T, 0)
 end
+

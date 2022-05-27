@@ -38,7 +38,8 @@ local node_box = {
   },
 }
 
-local function update_info(pos, node, meta)
+--local function update_info(pos, node, meta)
+local function update_info(_, node, meta)
   local def = minetest.registered_nodes[node.name]
   local fuel = meta:get_int("fuel")
   local fuel_percent = math.floor((fuel/def._fuel_capacity)*100)
@@ -57,7 +58,7 @@ local function update_info(pos, node, meta)
   meta:set_string("formspec", formspec)
 end
     
-local add_fuel = function(pos, node, meta, puncher, fuel_capacity)
+local add_fuel = function(meta, puncher, fuel_capacity)
   -- add fuel if posible
   local wield_item = puncher:get_wielded_item()
   local idef = wield_item:get_definition()
@@ -110,7 +111,8 @@ minetest.register_node("power_generators:fuel_tank", {
     groups = {cracky = 2},
     
     _fuel_capacity = 256,
-    _take_fuel = function(pos, node, meta, amount)
+    --_take_fuel = function(pos, node, meta, amount)
+    _take_fuel = function(pos, _, meta, amount)
       local fuel = meta:get_float("fuel")
       if amount > fuel then
         amount = fuel
@@ -125,9 +127,10 @@ minetest.register_node("power_generators:fuel_tank", {
       local meta = minetest.get_meta(pos)
       update_info(pos, {name="power_generators:fuel_tank"}, meta)
     end,
-    on_punch = function(pos, node, puncher)
+    --on_punch = function(pos, node, puncher)
+    on_punch = function(pos, _, puncher)
       local meta = minetest.get_meta(pos)
-      add_fuel(pos, node, meta, puncher, 256)
+      add_fuel(meta, puncher, 256)
       update_info(pos, {name="power_generators:fuel_tank"}, meta)
     end,
   })

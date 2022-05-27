@@ -43,20 +43,23 @@ minetest.register_node("power_generators:junction_box", {
   },
   
   is_ground_content = false,
-  groups = {snappy = 2, choppy = 2, oddly_breakable_by_hand = 3, 
+  groups = {snappy = 2, choppy = 2, oddly_breakable_by_hand = 3,
       },
   sounds = node_sounds,
   
   _generator_connect_sides = appliances.all_sides,
   _generator_powered_valid_sides = {R = true, L = true, F = true, B = true, U = true, D = true},
   
-  after_dig_node = function(pos, oldnode, oldmetadata, digger)
+  --after_dig_node = function(pos, oldnode, oldmetadata, digger)
+  after_dig_node = function(pos, oldnode)
     Cable:after_dig_tube(pos, oldnode)
   end,
-  after_place_node = function(pos, placer, itemstack, pointed_thing)
+  --after_place_node = function(pos, placer, itemstack, pointed_thing)
+  after_place_node = function(pos)
     Cable:after_place_node(pos)
   end,
-  tubelib2_on_update2 = function(pos, dir1, tlib2, node)
+  --tubelib2_on_update2 = function(pos, dir1, tlib2, node)
+  tubelib2_on_update2 = function()
     print("tubelib2_on_update2 junction")
   end,
   on_rotate = screwdriver.disallow, -- important!
@@ -65,7 +68,8 @@ minetest.register_node("power_generators:junction_box", {
   on_construct = function(pos)
     minetest.get_node_timer(pos):start(1)
   end,
-  on_timer = function(pos, elapsed)
+  --on_timer = function(pos, elapsed)
+  on_timer = function(pos)
     local meta = minetest.get_meta(pos)
     local generators_input = 0
     for _, dir in pairs(appliances.all_sides) do
@@ -84,7 +88,7 @@ minetest.register_node("power_generators:junction_box", {
   end,
   on_punch = function(pos)
     local timer = minetest.get_node_timer(pos)
-    if not timer:is_started() then  
+    if not timer:is_started() then
       timer:start(1)
     end
   end,

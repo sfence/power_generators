@@ -51,7 +51,7 @@ if minetest.get_modpath("hades_sounds") then
 end
 if minetest.get_modpath("sounds") then
   node_sounds = sounds.node_metal()
-end  
+end
 
 minetest.register_node("power_generators:framework", {
   description = S("Framework"),

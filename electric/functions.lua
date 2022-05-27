@@ -17,7 +17,7 @@ local function get_connected_node(pos, side)
   if not (epos and edir) then
     return nil, nil
   end
-  local _,node = Cable:get_node(epos)
+  _,node = Cable:get_node(epos)
   local out_side = tubelib2.dir_to_side(tubelib2.Turn180Deg[edir], node.param2)
   local node_def = minetest.registered_nodes[node.name];
   if node_def and node_def._generator_powered_valid_sides and node_def._generator_powered_valid_sides[out_side] then

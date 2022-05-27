@@ -15,7 +15,7 @@ power_generators.shaft_switch = appliances.appliance:new(
       node_name_active = "power_generators:shaft_switch_active",
       
       node_description = S("Shaft Gearbox Switch"),
-    	node_help = S("Can be greased.").."\n"..S("Can join/disjoin shaft."),
+      node_help = S("Can be greased.").."\n"..S("Can join/disjoin shaft."),
       
       input_stack_size = 0,
       have_input = false,
@@ -39,7 +39,8 @@ power_generators.shaft_switch = appliances.appliance:new(
           sound = "power_generators_shaft_switch_running",
           sound_param = {max_hear_distance = 16, gain = 1},
           repeat_timer = 1,
-          update_sound = function(self, pos, meta, old_state, new_state, sound)
+          --update_sound = function(self, pos, meta, old_state, new_state, sound)
+          update_sound = function(self, _, meta, _, _, sound)
             local rpm = meta:get_int("L")/meta:get_int("Isum")
             local new_sound = {
               sound = sound.sound,
@@ -69,10 +70,12 @@ shaft_switch:power_data_register(
 shaft_switch:control_data_register(
   {
     ["template_control"] = {
-        control_wait = function(self, control, pos, meta)
+        --control_wait = function(self, control, pos, meta)
+        control_wait = function(self)
           return false
         end,
-        on_punch = function(self, control, pos, node, puncher, pointed_thing)
+        --on_punch = function(self, control, pos, node, puncher, pointed_thing)
+        on_punch = function(self, _, pos)
           local meta = minetest.get_meta(pos)
           if meta:get_int("back_ratio")==0 then
             meta:set_int("back_ratio", 1)
@@ -93,7 +96,7 @@ shaft_switch:control_data_register(
 -- Formspec --
 --------------
 
-function shaft_switch:get_formspec(meta, production_percent, consumption_percent)
+function shaft_switch:get_formspec()
   return "";
 end
 
@@ -114,7 +117,8 @@ function shaft_switch:cb_on_construct(pos)
   self:call_on_construct(pos, meta)
 end
 
-function shaft_switch:get_infotext(pos, meta, state)
+--function shaft_switch:get_infotext(pos, meta, state)
+function shaft_switch:get_infotext(_, meta, _)
   if meta:get_int("back_ratio")==0 then
     return self.node_description.." - "..S("off")
   else

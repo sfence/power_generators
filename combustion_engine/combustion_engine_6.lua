@@ -18,7 +18,8 @@ local _shaft_sides = {"front"}
 local engine_sound = {
     sound = "power_generators_combustion_engine_6c_running",
     sound_param = {max_hear_distance = 32, gain = 1, pitch = 1},
-    update_sound = function(self, pos, meta, old_state, new_state, sound)
+    --update_sound = function(self, pos, meta, old_state, new_state, sound)
+    update_sound = function(self, _, meta, _, _, sound)
       local rpm = meta:get_int("L")/meta:get_int("Isum")
       local new_sound = {
         sound = sound.sound,
@@ -44,7 +45,7 @@ power_generators.combustion_engine_6c = appliances.appliance:new(
       node_name_active = "power_generators:combustion_engine_6c_active",
       
       node_description = S("Combustion engine"),
-    	node_help = S("Use this for generate shaft power up to @1.", "323M").."\n"..S("Fuel supply open and close by punch.").."\n"..S("Can be greased.").."\n"..S("Place fuel tank on top."),
+      node_help = S("Use this for generate shaft power up to @1.", "323M").."\n"..S("Fuel supply open and close by punch.").."\n"..S("Can be greased.").."\n"..S("Place fuel tank on top."),
       
       input_stack_size = 0,
       have_input = false,
@@ -103,12 +104,8 @@ combustion_engine_6c:control_data_register(
 -- Formspec --
 --------------
 
-local player_inv = "list[current_player;main;1.5,3.5;8,4;]";
-if minetest.get_modpath("hades_core") then
-   player_inv = "list[current_player;main;0.5,3.5;10,4;]";
-end
-
-function combustion_engine_6c:get_formspec(meta, production_percent, consumption_percent)
+--function combustion_engine_6c:get_formspec(meta, production_percent, consumption_percent)
+function combustion_engine_6c:get_formspec(meta, _, _)
   local throttle = meta:get_float("throttle")
   local bar = "scrollbar[2.25,1;1,6;vertical;throttle;"..(math.floor(1400-throttle*1000)).."]";
   
@@ -291,7 +288,8 @@ local node_def = {
     
     _shaft_sides = _shaft_sides,
     
-    on_receive_fields = function(pos, formname, fields, sender)
+    --on_receive_fields = function(pos, formname, fields, sender)
+    on_receive_fields = function(pos, _, fields)
       if fields.throttle then
         local exp = minetest.explode_scrollbar_event(fields.throttle)
         local meta = minetest.get_meta(pos)

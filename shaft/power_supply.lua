@@ -14,17 +14,22 @@ local power_supply = {
         end
         return 0;
       end,
-    power_need = function (self, power_data, pos, meta)
+    --power_need = function (self, power_data, pos, meta)
+    power_need = function (self)
       end,
-    power_idle = function (self, power_data, pos, meta)
+    --power_idle = function (self, power_data, pos, meta)
+    power_idle = function (self)
       end,
-    on_production = function (self, power_data, timer_step)
+    --on_production = function (self, power_data, timer_step)
+    on_production = function (self, _, timer_step)
         power_generators.shaft_step(self, timer_step.pos, timer_step.meta, timer_step.use_usage)
       end,
-    waiting = function (self, power_data, pos, meta)
+    --waiting = function (self, power_data, pos, meta)
+    waiting = function (self, _, pos, meta)
         power_generators.shaft_step(self, pos, meta, nil)
       end,
-    no_power = function (self, power_data, pos, meta)
+    --no_power = function (self, power_data, pos, meta)
+    no_power = function (self, _, pos, meta)
         power_generators.shaft_step(self, pos, meta, nil)
       end,
     update_node_def = function(self, power_data, node_def)
@@ -43,7 +48,8 @@ local power_supply = {
           node_def.groups.greasable = 1
         end
       end,
-    on_construct = function(self, power_data, pos, meta)
+    --on_construct = function(self, power_data, pos, meta)
+    on_construct = function(self, power_data, _, meta)
         meta:set_int("I", power_data.I)
         meta:set_int("Isum", power_data.I)
         for _,side in pairs(self._shaft_sides) do

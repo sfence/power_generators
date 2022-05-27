@@ -14,7 +14,7 @@ power_generators.emergency_generator = appliances.appliance:new(
       node_name_active = "power_generators:emergency_generator_active",
       
       node_description = S("Emergency generator"),
-    	node_help = S("Fill it with liquid fuel.").."\n"..S("Use this for generate 150 PG EU.").."\n"..S("Startup and Shutdown by punch."),
+      node_help = S("Fill it with liquid fuel.").."\n"..S("Use this for generate 150 PG EU.").."\n"..S("Startup and Shutdown by punch."),
       
       input_stack_size = 0,
       have_input = false,
@@ -79,10 +79,9 @@ if minetest.get_modpath("hades_core") then
    player_inv = "list[current_player;main;0.5,3.5;10,4;]";
 end
 
-function emergency_generator:get_formspec(meta, production_percent, consumption_percent)
-  local progress = "";
-  
-  progress = "image[3.6,0.9;5.5,0.95;appliances_consumption_progress_bar.png^[transformR270]]";
+--function emergency_generator:get_formspec(meta, production_percent, consumption_percent)
+function emergency_generator:get_formspec(_, _, consumption_percent)
+  local progress = "image[3.6,0.9;5.5,0.95;appliances_consumption_progress_bar.png^[transformR270]]";
   if consumption_percent then
     progress = "image[3.6,0.9;5.5,0.95;appliances_consumption_progress_bar.png^[lowpart:" ..
             (consumption_percent) ..
@@ -114,11 +113,13 @@ function emergency_generator:cb_on_production(timer_step)
   power_generators.update_generator_supply(self.power_connect_sides, timer_step.pos, timer_step.use_usage)
 end
 
-function emergency_generator:cb_waiting(pos, meta)
+--function emergency_generator:cb_waiting(pos, meta)
+function emergency_generator:cb_waiting(pos)
   power_generators.update_generator_supply(self.power_connect_sides, pos, nil)
 end
 
-function emergency_generator:cb_deactivate(pos, meta)
+--function emergency_generator:cb_deactivate(pos, meta)
+function emergency_generator:cb_deactivate(pos)
   power_generators.update_generator_supply(self.power_connect_sides, pos, nil)
 end
 
