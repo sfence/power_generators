@@ -36,6 +36,7 @@ local power_supply = {
         node_def.groups.shaft = 1;
         node_def._shaft_sides = self.power_connect_sides;
         self._shaft_sides = self.power_connect_sides
+        node_def._shaft_types = self._shaft_types
         node_def._friction = power_data.friction
         self._friction = power_data.friction
         node_def._I = power_data.I

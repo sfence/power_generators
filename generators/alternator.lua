@@ -25,6 +25,8 @@ power_generators.alternator = appliances.appliance:new(
       power_connect_sides = {"back"},
       out_power_connect_sides = {"left", "right", "front"},
       
+      _shaft_types = {back="steel"},
+      
       sounds = {
         active_running = {
           sound = "power_generators_alternator_startup",

@@ -8,6 +8,7 @@
 local S = power_generators.translator;
 
 local _shaft_sides = {"top","bottom", "front"}
+local _shaft_types = {front="steel",top="steel",bottom="steel"}
 
 power_generators.shaft_verFront = appliances.appliance:new(
     {
@@ -25,6 +26,7 @@ power_generators.shaft_verFront = appliances.appliance:new(
       
       power_connect_sides = {"right","left"},
       _shaft_sides = _shaft_sides,
+      _shaft_types = _shaft_types,
       _friction = 1,
       _I = 10,
       
@@ -192,6 +194,7 @@ local node_def = {
     _inspect_msg_func = power_generators.grease_inspect_msg,
     
     _shaft_sides = _shaft_sides,
+    _shaft_types = _shaft_types,
  }
 
 local node_inactive = {

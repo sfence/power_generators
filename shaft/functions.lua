@@ -53,6 +53,8 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
     local from_pos = pos
     local ratio = meta:get_float(side.."_ratio")
     local TPart = meta:get_float(side.."_Tpart")
+    --print("side "..side.." node: "..dump(side_node))
+    local shaft_type = self._shaft_types[side]
     local s_I = 0
     local s_F = 0
     --print("side "..side.." node: "..dump(side_node))
@@ -64,6 +66,9 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
       local side_def = minetest.registered_nodes[side_node.name]
       local side_side = appliances.is_connected_to(side_pos, side_node, from_pos, side_def._shaft_sides)
       if not side_side then
+        break
+      end
+      if (side_def._shaft_types[side_side]~=shaft_type) then
         break
       end
       local side_meta = minetest.get_meta(side_pos)
@@ -119,6 +124,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
       end
       
       from_pos = side_pos
+      shaft_type = side_def._shaft_types[appliances.opposite_side[side_side]]
       side_pos = appliances.get_side_pos(side_pos, side_node, appliances.opposite_side[side_side])
       side_node = minetest.get_node(side_pos)
     end

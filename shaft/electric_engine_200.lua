@@ -9,6 +9,7 @@
 local S = power_generators.translator;
 
 local _shaft_sides = {"front"}
+local _shaft_types = {front="steel"}
 
 power_generators.electric_engine_200 = appliances.appliance:new(
     {
@@ -25,6 +26,7 @@ power_generators.electric_engine_200 = appliances.appliance:new(
       
       power_connect_sides = {"back","right","left"},
       _shaft_sides = _shaft_sides,
+      _shaft_types = _shaft_types,
       _friction = 10,
       _maxT = 20000,
       -- maxP per step is (maxT/I)*I
@@ -226,6 +228,7 @@ local node_def = {
     _inspect_msg_func = power_generators.grease_inspect_msg,
     
     _shaft_sides = _shaft_sides,
+    _shaft_types = _shaft_types,
  }
 
 local node_inactive = {

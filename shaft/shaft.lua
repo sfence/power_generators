@@ -95,6 +95,7 @@ minetest.register_node("power_generators:shaft_hor", {
     collision_box = hor_box,
     groups = {cracky = 1, shaft = 2},
     _shaft_sides = {"front","back"},
+    _shaft_types = {front="steel",back="steel"},
     
     on_construct = function(pos)
       local meta = minetest.get_meta(pos)
@@ -114,6 +115,7 @@ minetest.register_node("power_generators:shaft_ver", {
     collision_box = ver_box,
     groups = {cracky = 1, shaft = 2},
     _shaft_sides = {"bottom","top"},
+    _shaft_types = {bottom="steel",top="steel"},
     
     on_construct = function(pos)
       local meta = minetest.get_meta(pos)

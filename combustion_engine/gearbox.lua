@@ -8,6 +8,7 @@
 local S = power_generators.translator;
 
 local _shaft_sides = {"front", "back", "top"}
+local _shaft_types = {front="steel",back="comb_engine",top="starter"}
 
 power_generators.ce_gearbox = appliances.appliance:new(
     {
@@ -28,6 +29,7 @@ power_generators.ce_gearbox = appliances.appliance:new(
       have_control = true,
       
       _shaft_sides = _shaft_sides,
+      _shaft_types = _shaft_types,
       _shaft_side = "front",
       _starter_side = "top",
       _engine_side = "back",
@@ -245,6 +247,7 @@ local node_def = {
     _inspect_msg_func = power_generators.grease_inspect_msg,
     
     _shaft_sides = _shaft_sides,
+    _shaft_types = _shaft_types,
  }
 
 local node_inactive = {

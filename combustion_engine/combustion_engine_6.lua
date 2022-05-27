@@ -14,6 +14,7 @@ local S = power_generators.translator;
 -- friction = friction*(rpm+2000000/(3*rpm+1000))
 
 local _shaft_sides = {"front"}
+local _shaft_types = {front="comb_engine"}
 
 local engine_sound = {
     sound = "power_generators_combustion_engine_6c_running",
@@ -58,6 +59,7 @@ power_generators.combustion_engine_6c = appliances.appliance:new(
       have_control = true,
       
       _shaft_sides = _shaft_sides,
+      _shaft_types = _shaft_types,
       _friction = 30,
       _I = 150,
       -- maxP per step is (maxT/I)*I
@@ -287,6 +289,7 @@ local node_def = {
     _inspect_msg_func = power_generators.grease_inspect_msg,
     
     _shaft_sides = _shaft_sides,
+    _shaft_types = _shaft_types,
     
     --on_receive_fields = function(pos, formname, fields, sender)
     on_receive_fields = function(pos, _, fields)

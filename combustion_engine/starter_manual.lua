@@ -8,6 +8,7 @@
 local S = power_generators.translator;
 
 local _shaft_sides = {"bottom"}
+local _shaft_types = {bottom="starter"}
 
 local starter_sound = {
     sound = "power_generators_starter_manual_running",
@@ -43,6 +44,7 @@ power_generators.starter_manual = appliances.appliance:new(
       power_connect_sides = {"front","back","right","left"},
       
       _shaft_sides = _shaft_sides,
+      _shaft_types = _shaft_types,
       _friction = 0.5,
       _I = 1000,
       -- F of human etc 400 N, 250W
@@ -164,6 +166,7 @@ local node_def = {
     _inspect_msg_func = power_generators.grease_inspect_msg,
     
     _shaft_sides = _shaft_sides,
+    _shaft_types = _shaft_types,
  }
 
 local node_inactive = {
