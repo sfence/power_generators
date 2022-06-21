@@ -55,7 +55,7 @@ end
 if minetest.get_modpath("technic") then
   items.strong_ingot = "technic:stainless_steel_ingot"
   items.metal_ingot = "technic:carbon_steel_ingot"
-  items.metal_block = "technic:carbon_steel_ingot"
+  items.metal_block = "technic:carbon_steel_block"
   items.controller = "technic:control_logic_unit"
   
   items.transformer = "technic:lv_transformer"
@@ -66,7 +66,7 @@ end
 if minetest.get_modpath("hades_technic") then
   items.strong_ingot = "hades_technic:stainless_steel_ingot"
   items.metal_ingot = "hades_technic:carbon_steel_ingot"
-  items.metal_block = "hades_technic:carbon_steel_ingot"
+  items.metal_block = "hades_technic:carbon_steel_block"
   items.controller = "hades_technic:control_logic_unit"
   
   items.transformer = "hades_technic:lv_transformer"
@@ -100,6 +100,29 @@ minetest.register_craft({
       {items.transformer, items.transformer, items.transformer},
     },
     replacements = {{items.copper_wire,items.empty_spool}},
+  })
+
+minetest.register_craft({
+    output = "power_generators:power_meter",
+    recipe = {
+      {"power_generators:electric_cableS", "power_generators:electric_cableS", "power_generators:electric_cableS"},
+      {items.plastic_sheet, items.plastic_strip, items.plastic_sheet},
+      {items.transformer, items.metal_block, items.magnet},
+    },
+    replacements = {{items.copper_wire,items.empty_spool}},
+  })
+
+minetest.register_craft({
+    output = "power_generators:charger",
+    recipe = {
+      {"power_generators:electric_cableS", "power_generators:electric_cableS", "power_generators:electric_cableS"},
+      {items.plastic_sheet, items.metal_block, items.plastic_sheet},
+      {items.transformer, items.controller, items.copper_wire},
+    },
+    replacements = {
+      {items.copper_wire,items.empty_spool},
+      {items.copper_wire,items.empty_spool},
+    },
   })
 
 minetest.register_craft({
