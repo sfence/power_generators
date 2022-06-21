@@ -121,6 +121,19 @@ function combustion_engine_6c:get_formspec(meta, _, _)
   return formspec;
 end
 
+function combustion_engine_6c:cb_on_receive_fields(pos, formname, fields, sender)
+    if fields.throttle then
+      local exp = minetest.explode_scrollbar_event(fields.throttle)
+      local meta = minetest.get_meta(pos)
+      meta:set_float("throttle", (1400-exp.value)/1000)
+    end
+    if fields.quit then
+      local meta = minetest.get_meta(pos)
+      meta:set_string("formspec", combustion_engine_6c:get_formspec(meta, 0, 0))
+    end
+  self:call_on_receive_fields(pos, formname, fields, sender)
+end
+
 ---------------
 -- Callbacks --
 ---------------
@@ -289,20 +302,7 @@ local node_def = {
     _inspect_msg_func = power_generators.grease_inspect_msg,
     
     _shaft_sides = _shaft_sides,
-    _shaft_types = _shaft_types,
-    
-    --on_receive_fields = function(pos, formname, fields, sender)
-    on_receive_fields = function(pos, _, fields)
-      if fields.throttle then
-        local exp = minetest.explode_scrollbar_event(fields.throttle)
-        local meta = minetest.get_meta(pos)
-        meta:set_float("throttle", (1400-exp.value)/1000)
-      end
-      if fields.quit then
-        local meta = minetest.get_meta(pos)
-        meta:set_string("formspec", combustion_engine_6c:get_formspec(meta, 0, 0))
-      end
-    end,
+    _shaft_types = _shaft_types,   
  }
 
 local node_inactive = {
