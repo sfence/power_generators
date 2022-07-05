@@ -47,6 +47,8 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
   
   local powered_shafts = 0
   
+  local rpm_opposite = false
+  
   for _,side in pairs(self._shaft_sides) do
     local side_pos = appliances.get_side_pos(pos, node, side)
     local side_node = minetest.get_node(side_pos)
@@ -85,12 +87,29 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
         local engine_side = meta:get_int(side.."_engine")
         local engine_side_side = side_meta:get_int(side_side.."_engine")
         
+        local o_rpm_opposite = false
+        if self._shaft_opposites and side_def._shaft_opposites then
+          if not self._shaft_opposites[side] then
+            o_rpm_opposite = true
+          end
+          if side_def._shaft_opposites[side_side] then
+            o_rpm_opposite = not o_rpm_opposite
+          end
+          if (o_rpm<0) then
+            o_rpm_opposite = not o_rpm_opposite
+            o_rpm = math.abs(o_rpm)
+          end
+        else
+          o_rpm = math.abs(o_rpm)
+        end
+        
         table.insert(shafts, {
           meta = side_meta,
           timer = minetest.get_node_timer(side_pos),
           ratio = ratio,
           I = o_I,
           rpm = o_rpm,
+          rpm_opposite = o_rpm_opposite,
           engine_side = engine_side,
           engine_side_side = engine_side_side,
           side = side,
@@ -117,6 +136,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
           end
           rpmPwrSum = rpmPwrSum + o_rpm/ratio
         end
+        rpm_opposite = rpm_opposite or o_rpm_opposite
         break
       else
         s_I = s_I + side_meta:get_int("I")*ratio
@@ -157,6 +177,15 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
         end
         break
       end
+    end
+  end
+  
+  -- check opposite
+  if rpm_opposite then
+    -- do break
+    local ret = self:shaft_break(pos, node, meta)
+    if ret then
+      return
     end
   end
   

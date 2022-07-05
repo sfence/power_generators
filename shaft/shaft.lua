@@ -85,7 +85,7 @@ local ver_box = {
 }
 
 minetest.register_node("power_generators:shaft_hor", {
-    description = S("Shaft"),
+    description = S("Horizontal Shaft"),
     drawtype = "mesh",
     mesh = "power_generators_shaft.obj",
     tiles = {"power_generators_frame_steel.png", "power_generators_shaft_steel.png"},
@@ -105,7 +105,7 @@ minetest.register_node("power_generators:shaft_hor", {
   })
 
 minetest.register_node("power_generators:shaft_ver", {
-    description = S("Shaft"),
+    description = S("Vertical Shaft"),
     drawtype = "mesh",
     mesh = "power_generators_shaft_ver.obj",
     tiles = {"power_generators_frame_steel.png", "power_generators_shaft_steel.png"},
