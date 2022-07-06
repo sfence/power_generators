@@ -7,6 +7,125 @@ local S = power_generators.translator
 -- rpm -> revolution
 -- fric -> friction torque
 
+local function find_side_shafts(shafts, top_data, side_data)
+  local side = side_data.side
+  local side_pos = side_data.side_pos
+  local side_node = side_data.side_node
+  local from_pos = side_data.from_pos
+  local ratio = side_data.ratio
+  local TPart = side_data.TPart
+  local shaft_type = side_data.shaft_type
+  local s_I = 0
+  local s_F = 0
+  --print("side "..side.." node: "..dump(side_node))
+  while ratio>0 do
+    local shaft = minetest.get_item_group(side_node.name, "shaft")
+    if shaft<=0 then
+      break
+    end
+    local side_def = minetest.registered_nodes[side_node.name]
+    local side_side = appliances.is_connected_to(side_pos, side_node, from_pos, side_def._shaft_sides)
+    if not side_side then
+      break
+    end
+    if (side_def._shaft_types[side_side]~=shaft_type) then
+      break
+    end
+    local side_meta = minetest.get_meta(side_pos)
+    if shaft==1 then
+      local o_ratio = side_meta:get_float(side_side.."_ratio")
+      if o_ratio==0 then
+        break
+      end
+      local o_I = side_meta:get_int("Isum")
+      local o_F = side_meta:get_int("fric")
+      --local o_T = side_meta:get_int("T")
+      local o_rpm = side_meta:get_int("L")/o_I
+      ratio = ratio/o_ratio
+      side_data.ratio = ratio
+      local engine_side = top_data.meta:get_int(side.."_engine")
+      local engine_side_side = side_meta:get_int(side_side.."_engine")
+      
+      local o_rpm_opposite = false
+      local o_rpm_negative = false
+      if top_data._shaft_opposites and side_def._shaft_opposites then
+        if not top_data._shaft_opposites[side] then
+          o_rpm_opposite = true
+        end
+        if side_def._shaft_opposites[side_side] then
+          o_rpm_opposite = not o_rpm_opposite
+        end
+        o_rpm_negative = o_rpm_opposite
+        if (o_rpm<0) then
+          o_rpm_opposite = not o_rpm_opposite
+          o_rpm = math.abs(o_rpm)
+        end
+      else
+        o_rpm = math.abs(o_rpm)
+      end
+      
+      table.insert(shafts, {
+        meta = side_meta,
+        timer = minetest.get_node_timer(side_pos),
+        ratio = ratio,
+        I = o_I,
+        rpm = o_rpm,
+        rpm_negative = o_rpm_negative,
+        engine_side = engine_side,
+        engine_side_side = engine_side_side,
+        side = side,
+        side_side = side_side,
+        
+        --[ [
+        name = side_node.name,
+        fric = o_F,
+        side_TPart = TPart,
+        --]]
+      })
+      if engine_side_side==0 then
+        --print(string.format("Usum + s_I + o_I*ratio = %d + %d +%d*%f", Isum, s_I, o_I, ratio))
+        top_data.Isum = top_data.Isum + s_I + o_I*ratio
+        top_data.minT = top_data.minT + side_meta:get_int("minT")*ratio*TPart
+        top_data.Fsum = top_data.Fsum + s_F + o_F*ratio*TPart
+        top_data.powered_shafts = top_data.powered_shafts + 1
+      else
+        --Tpwr = Tpwr + o_T*ratio
+        if top_data.rpmPwr>0 then
+          top_data.rpmPwr = math.min(rpmPwr, o_rpm/ratio)
+        else
+          top_data.rpmPwr = o_rpm/ratio
+        end
+        top_data.rpmPwrSum = top_data.rpmPwrSum + o_rpm/ratio
+      end
+      top_data.rpm_opposite = top_data.rpm_opposite or o_rpm_opposite
+      break
+    else
+      s_I = s_I + side_meta:get_int("I")*ratio
+      s_F = s_F + side_meta:get_float("fric")*ratio
+      
+      if side_def._shaft_rpm_update then
+        table.insert(shafts, {
+            meta = side_meta,
+            pos = side_pos,
+            node = side_node,
+            ratio = ratio,
+            rpm_update = side_def._shaft_rpm_update,
+          })
+      end
+    end
+    
+    from_pos = side_pos
+    shaft_type = side_def._shaft_types[appliances.opposite_side[side_side]]
+    side_pos = appliances.get_side_pos(side_pos, side_node, appliances.opposite_side[side_side])
+    side_node = minetest.get_node(side_pos)
+    
+    side_data.from_pos = from_pos
+    side_data.shaft_type = shaft_type
+    side_data.side_pos = side_pos
+    side_data.side_node = side_node
+  end
+end
+
 function power_generators.shaft_step(self, pos, meta, use_usage)
   -- E = sum(I*rpm*rpm)
   -- E = I*rpm^2+I1*rpm1^2+I2*rmp2^2+I3*rmp3^2
@@ -37,26 +156,39 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
   
   local node = minetest.get_node(pos)
   local I = meta:get_int("I")
-  local minT = 0
   
-  Isum = I
-  local Fsum = 0
-  --local Tpwr = 0
-  local rpmPwr = 0
-  local rpmPwrSum = 0
-  
-  local powered_shafts = 0
-  
-  local rpm_opposite = false
+  local top_data = {
+      minT = 0,
+      
+      Isum = I,
+      Fsum = 0,
+      -- Tpwr = 0,
+      rpmPwr = 0,
+      rpmPwrSum = 0,
+      
+      powered_shafts = 0,
+      
+      rpm_opposite = false,
+      
+      meta = meta,
+      _shaft_opposites = self._shaft_opposites,
+    }
   
   for _,side in pairs(self._shaft_sides) do
     local side_pos = appliances.get_side_pos(pos, node, side)
-    local side_node = minetest.get_node(side_pos)
-    local from_pos = pos
-    local ratio = meta:get_float(side.."_ratio")
-    local TPart = meta:get_float(side.."_Tpart")
+    local side_data = {
+        side = side,
+        side_pos = side_pos,
+        side_node = minetest.get_node(side_pos),
+        from_pos = pos,
+        ratio = meta:get_float(side.."_ratio"),
+        TPart = meta:get_float(side.."_Tpart"),
+        shaft_type = self._shaft_types[side],
+      }
     --print("side "..side.." node: "..dump(side_node))
-    local shaft_type = self._shaft_types[side]
+    find_side_shafts(shafts, top_data, side_data)
+    --[[
+    local shaft_type = self._shaft_typeVs[side]
     local s_I = 0
     local s_F = 0
     --print("side "..side.." node: "..dump(side_node))
@@ -88,6 +220,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
         local engine_side_side = side_meta:get_int(side_side.."_engine")
         
         local o_rpm_opposite = false
+        local o_rpm_negative = false
         if self._shaft_opposites and side_def._shaft_opposites then
           if not self._shaft_opposites[side] then
             o_rpm_opposite = true
@@ -95,6 +228,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
           if side_def._shaft_opposites[side_side] then
             o_rpm_opposite = not o_rpm_opposite
           end
+          o_rpm_negative = o_rpm_opposite
           if (o_rpm<0) then
             o_rpm_opposite = not o_rpm_opposite
             o_rpm = math.abs(o_rpm)
@@ -109,7 +243,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
           ratio = ratio,
           I = o_I,
           rpm = o_rpm,
-          rpm_opposite = o_rpm_opposite,
+          rpm_negative = o_rpm_negative,
           engine_side = engine_side,
           engine_side_side = engine_side_side,
           side = side,
@@ -119,7 +253,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
           name = side_node.name,
           fric = o_F,
           side_TPart = TPart,
-          --]]
+          --]
         })
         if engine_side_side==0 then
           --print(string.format("Usum + s_I + o_I*ratio = %d + %d +%d*%f", Isum, s_I, o_I, ratio))
@@ -141,21 +275,34 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
       else
         s_I = s_I + side_meta:get_int("I")*ratio
         s_F = s_F + side_meta:get_float("fric")*ratio
+        
+        if side_def._shaft_rpm_update then
+          table.insert(shafts, {
+              meta = side_meta,
+              pos = side_pos,
+              node = side_node,
+              ratio = ratio,
+              rpm_update = side_def._shaft_rpm_update,
+            })
+        end
       end
       
       from_pos = side_pos
-      shaft_type = side_def._shaft_types[appliances.opposite_side[side_side]]
+      shaft_type = side_def._shaft_types[appliances.opposite_side[side_side] ]
       side_pos = appliances.get_side_pos(side_pos, side_node, appliances.opposite_side[side_side])
       side_node = minetest.get_node(side_pos)
     end
+    --]]
     -- special update code
-    while (ratio==0) and (need_update==1) do
+    while (side_data.ratio==0) and (need_update==1) do
+      local side_pos = side_data.side_pos
+      local side_node = side_data.side_node
       local shaft = minetest.get_item_group(side_node.name, "shaft")
       if shaft<=0 then
         break
       end
       local side_def = minetest.registered_nodes[side_node.name]
-      local side_side = appliances.is_connected_to(side_pos, side_node, from_pos, side_def._shaft_sides)
+      local side_side = appliances.is_connected_to(side_pos, side_node, side_data.from_pos, side_def._shaft_sides)
       if not side_side then
         break
       end
@@ -181,7 +328,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
   end
   
   -- check opposite
-  if rpm_opposite then
+  if top_data.rpm_opposite then
     -- do break
     local ret = self:shaft_break(pos, node, meta)
     if ret then
@@ -189,9 +336,16 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
     end
   end
   
+  -- process rotation direction if needed
+  local rpm_negative = false
+  if rpm<0 then
+    rpm_negative = true
+    rpm = math.abs(rpm)
+  end
+  
   -- losts
   --print(node.name.." on "..minetest.pos_to_string(pos))
-  local friction = self._friction + Fsum
+  local friction = self._friction + top_data.Fsum
   if not friction then
     friction = meta:get_float("fric")
   end
@@ -210,66 +364,78 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
   end
   -- min on 480 rpm 1300 friction, at 0 rpm 2000 friction
   friction = friction*(qgrease*rpm+2000000/(3*rpm+1000))
-  minT = minT + friction
+  top_data.minT = top_data.minT + friction
   --E = math.max(E - friction*(rpm+1000), 0)
   --print("rpmPwr: "..rpmPwr.." Isum: "..Isum.." friction: "..friction.." minT: "..minT)
   --print("shafts: "..dump(shafts))
   
   -- recalculate
-  if rpmPwr>0 then
-    rpm = rpmPwr
+  if top_data.rpmPwr>0 then
+    rpm = top_data.rpmPwr
   else
-    rpm = math.max(rpm - minT/Isum, 0)
+    rpm = math.max(rpm - top_data.minT/top_data.Isum, 0)
   end
   local new_rpm
   for _,shaft in pairs(shafts) do
     new_rpm = rpm*shaft.ratio
-    shaft.meta:set_int("L", math.floor(new_rpm*shaft.I))
-    if (shaft.engine_side_side==0) and (rpmPwr>0) then
-      meta:set_int(shaft.side.."_engine", 1)
-      --print("meta "..node.name.." "..shaft.side.."_engine: 1")
-    elseif (shaft.engine_side~=2) and (rpmPwr==0) then
-      --meta:set_int(shaft.side.."_engine", 0)
-      --meta:set_int("Tsum", 0)
-      --print("meta "..node.name.." "..shaft.side.."_engine: 0")
-    elseif (shaft.engine_side_side~=0) then
-      if shaft.engine_side==0 then
-        shaft.meta:set_float(shaft.side_side.."_Tpart", shaft.rpm/shaft.ratio/rpmPwrSum)
-        --print("Tpart: "..(shaft.rpm/shaft.ratio/rpmPwrSum))
-        --print("rpmPwrSum: "..rpmPwrSum)
-      --else
-        --shaft.meta:set_float(shaft.side_side.."_engine", 0)
+    if shaft.rpm_update then
+      shaft.rpm_update(shaft, new_rpm, rpmPwr)
+    else
+      if (shaft.rpm_negative==rpm_negative) then
+        shaft.meta:set_int("L", math.floor(new_rpm*shaft.I))
+      else
+        shaft.meta:set_int("L", math.floor(-new_rpm*shaft.I))
       end
-    end
-    if new_rpm>0 then
-      if (not shaft.timer:is_started()) then
-        shaft.timer:start(1)
+      if (shaft.engine_side_side==0) and (top_data.rpmPwr>0) then
+        meta:set_int(shaft.side.."_engine", 1)
+        --print("meta "..node.name.." "..shaft.side.."_engine: 1")
+      elseif (shaft.engine_side~=2) and (top_data.rpmPwr==0) then
+        --meta:set_int(shaft.side.."_engine", 0)
+        --meta:set_int("Tsum", 0)
+        --print("meta "..node.name.." "..shaft.side.."_engine: 0")
+      elseif (shaft.engine_side_side~=0) then
+        if shaft.engine_side==0 then
+          shaft.meta:set_float(shaft.side_side.."_Tpart", shaft.rpm/shaft.ratio/top_data.rpmPwrSum)
+          --print("Tpart: "..(shaft.rpm/shaft.ratio/rpmPwrSum))
+          --print("rpmPwrSum: "..rpmPwrSum)
+        --else
+          --shaft.meta:set_float(shaft.side_side.."_engine", 0)
+        end
       end
-    elseif (need_update==1) and (shaft.engine_side_side~=0) then
-      if (not shaft.timer:is_started()) then
-        shaft.timer:start(1)
+      if new_rpm>0 then
+        if (not shaft.timer:is_started()) then
+          shaft.timer:start(1)
+        end
+      elseif (need_update==1) and (shaft.engine_side_side~=0) then
+        if (not shaft.timer:is_started()) then
+          shaft.timer:start(1)
+        end
+        shaft.meta:set_int("update", 1)
+        --print(dump(shaft))
       end
-      shaft.meta:set_int("update", 1)
-      --print(dump(shaft))
+      --print("rpm: "..new_rpm)
+      --[[
+      if shaft.engine_side_side~=0 then
+        print(node.name.." on "..minetest.pos_to_string(pos).." powered from side "..shaft.side.." via "..shaft.name)
+      end
+      --]]
     end
-    --print("rpm: "..new_rpm)
-    --[[
-    if shaft.engine_side_side~=0 then
-      print(node.name.." on "..minetest.pos_to_string(pos).." powered from side "..shaft.side.." via "..shaft.name)
-    end
-    --]]
   end
-  meta:set_int("L", math.floor(rpm*Isum))
+  if (not rpm_negative) or (not self._shaft_opposites) then
+    meta:set_int("L", math.floor(rpm*top_data.Isum))
+  else
+    meta:set_int("L", math.floor(-rpm*top_data.Isum))
+  end
   
-  meta:set_int("minT", math.ceil(minT))
-  meta:set_int("Isum", math.ceil(Isum))
+  meta:set_int("minT", math.ceil(top_data.minT))
+  meta:set_int("Isum", math.ceil(top_data.Isum))
   --print("rpm: "..rpm)
   
   if (need_update==1) then
     meta:set_int("update", 0)
   end
   
-  if (#shafts==1) and (powered_shafts == 1) then
+  if (#shafts==1) and (top_data.powered_shafts == 1) then
     local shaft = shafts[1]
     --print("Check reset: "..dump(shaft))
     if (shaft.engine_side==1) then
@@ -278,7 +444,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
       shaft.meta:set_int(shaft.side_side.."_engine", 0)
       --print("Reset engine side "..shaft.name)
     end
-  elseif (#shafts==2) and (powered_shafts == 0) and (rpmPwr>0) then
+  elseif (#shafts==2) and (top_data.powered_shafts == 0) and (rpmPwr>0) then
     local shaft1 = shafts[1]
     local shaft2 = shafts[2]
     if shaft1.rpm > shaft2.rpm then
@@ -294,7 +460,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
       meta:set_int(shaft2.side.."_engine", 0)
       shaft2.meta:set_int(shaft2.side_side.."_engine", 1)
     end
-  elseif (#shafts>2) and (powered_shafts==#shafts) then
+  elseif (#shafts>2) and (top_data.powered_shafts==#shafts) then
     --print("Reset engine sides "..node.name)
     for _, shaft in pairs(shafts) do
       meta:set_int(shaft.side.."_engine", 0)
