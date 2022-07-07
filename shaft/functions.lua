@@ -145,6 +145,7 @@ local function default_find_side_shafts(shafts, need_rpm_update, top_data, side_
     side_data.side_node = side_node
   end
 end
+power_generators.default_find_side_shafts = default_find_side_shafts
 
 function power_generators.shaft_step(self, pos, meta, use_usage)
   -- E = sum(I*rpm*rpm)
