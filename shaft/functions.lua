@@ -86,6 +86,7 @@ local function default_find_side_shafts(shafts, need_rpm_update, top_data, side_
         
         --[[
         name = side_node.name,
+        pos = side_pos,
         fric = o_F,
         side_TPart = TPart,
         --]]
@@ -193,6 +194,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
       
       rpm_opposite = false,
       
+      pos = pos,
       meta = meta,
       _shaft_opposites = self._shaft_opposites,
     }
@@ -329,9 +331,10 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
         --shaft.meta:set_float(shaft.side_side.."_engine", 0)
       end
     end
-    if new_rpm>0 then
+    if new_rpm~=0 then
       if (not shaft.timer:is_started()) then
         shaft.timer:start(1)
+        --print("start timer on "..minetest.pos_to_string(shaft.pos))
       end
     elseif (need_update==1) and (shaft.engine_side_side~=0) then
       if (not shaft.timer:is_started()) then
