@@ -197,6 +197,7 @@ function power_generators.shaft_step(self, pos, meta, use_usage)
       pos = pos,
       meta = meta,
       _shaft_opposites = self._shaft_opposites,
+      self = self,
     }
   
   for _,side in pairs(self._shaft_sides) do
