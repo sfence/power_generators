@@ -11,6 +11,7 @@ local items = {
   plastic_sheet = "basic_materials:plastic_sheet",
   plastic_strip = "basic_materials:plastic_strip",
   steel_strip = "basic_materials:steel_strip",
+  steel_bar = "basic_materials:steel_bar",
   copper_wire = "basic_materials:copper_wire",
   empty_spool = "basic_materials:empty_spool",
   controller = "basic_materials:ic",
@@ -61,6 +62,8 @@ if minetest.get_modpath("technic") then
   items.transformer = "technic:lv_transformer"
   
   items.rubber = "technic:rubber"
+  
+  items.steel_bar = "basic_materials:carbon_steel_bar"
 end
 
 if minetest.get_modpath("hades_technic") then
@@ -72,6 +75,8 @@ if minetest.get_modpath("hades_technic") then
   items.transformer = "hades_technic:lv_transformer"
   
   items.rubber = "hades_technic:rubber"
+  
+  items.steel_bar = "basic_materials:carbon_steel_bar"
 end
 
 if minetest.get_modpath("elepower_dynamics") then
@@ -320,7 +325,7 @@ minetest.register_craft({
 minetest.register_craft({
     output = "power_generators:starter_manual",
     recipe = {
-      {"power_generators:carbon_steel_bar",items.steel_strip,"power_generators:carbon_steel_bar"},
+      {items.steel_bar,items.steel_strip,items.steel_bar},
       {items.steel_strip,"power_generators:framework","power_generators:shaft"},
       {"power_generators:combustion_engine_gearbox","power_generators:shaft","power_generators:combustion_engine_gearbox"},
     }
@@ -369,9 +374,9 @@ end
 minetest.register_craft({
     output = "power_generators:framework_base",
     recipe = {
-      {"","power_generators:carbon_steel_bar",""},
-      {"power_generators:carbon_steel_bar","", "power_generators:carbon_steel_bar"},
-      {"","power_generators:carbon_steel_bar",""},
+      {"",items.steel_bar,""},
+      {items.steel_bar,"", items.steel_bar},
+      {"",items.steel_bar,""},
     }
   })
 
@@ -379,13 +384,13 @@ minetest.register_craft({
     type = "shapeless",
     output = "power_generators:framework",
     recipe = {
-      "power_generators:carbon_steel_bar",
-      "power_generators:carbon_steel_bar",
-      "power_generators:carbon_steel_bar",
-      "power_generators:carbon_steel_bar",
+      items.steel_bar,
+      items.steel_bar,
+      items.steel_bar,
+      items.steel_bar,
       "power_generators:framework_base",
       "power_generators:framework_base",
-      "power_generators:carbon_steel_bar",
+      items.steel_bar,
     }
   })
 
@@ -546,7 +551,7 @@ minetest.register_craft({
 minetest.register_craft({
     output = "power_generators:shaft_switch",
     recipe = {
-      {"power_generators:framework",items.iron_ingot,"power_generators:carbon_steel_bar"},
+      {"power_generators:framework",items.iron_ingot,items.steel_bar},
       {items.iron_ingot,"power_generators:shaft",items.iron_ingot},
       {items.gear,items.iron_ingot,items.gear},
     }
@@ -573,9 +578,9 @@ minetest.register_craft({
 minetest.register_craft({
     output = "power_generators:rpm_meter_watt",
     recipe = {
-      {"power_generators:carbon_steel_bar","","power_generators:carbon_steel_bar"},
+      {items.steel_bar,"",items.steel_bar},
       {items.string,"power_generators:shaft",items.plastic_sheet},
-      {"power_generators:carbon_steel_bar","","power_generators:carbon_steel_bar"},
+      {items.steel_bar,"",items.steel_bar},
     }
   })
 
