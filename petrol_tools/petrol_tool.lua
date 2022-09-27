@@ -327,3 +327,19 @@ minetest.register_on_leaveplayer(function(player)
     end
   end)
 
+minetest.register_allow_player_inventory_action(function(player, action, inv, inv_info)
+    local player_name = player:get_player_name()
+    if players[players] then
+      if action=="put" then
+        return inv_info.stack:get_count()
+      end
+      return 0
+    else
+      if action=="move" then
+        return inv_info.count
+      else
+        return inv_info.stack:get_count()
+      end
+    end
+  end)
+
