@@ -87,89 +87,91 @@ if minetest.get_modpath("techage") then
   items.valve = "techage:ta3_valve_open"
 end
 
+local adaptation = power_generators.adaptation
+
 minetest.register_craft({
     output = "power_generators:electric_cableS 6",
     recipe = {
-      {items.plastic_sheet, items.dye_yellow, ""},
-      {"", items.copper_wire, ""},
-      {"", "", items.plastic_sheet},
+      {adaptation.plastic_sheet.name, adaptation.dye_yellow.name, ""},
+      {"", adaptation.copper_wire.name, ""},
+      {"", "", adaptation.plastic_sheet.name},
     },
-    replacements = {{items.copper_wire, items.empty_spool}},
+    replacements = {{adaptation.copper_wire.name, adaptation.empty_spool.name}},
   })
 
 minetest.register_craft({
     output = "power_generators:junction_box",
     recipe = {
       {"power_generators:electric_cableS", "power_generators:electric_cableS", "power_generators:electric_cableS"},
-      {items.plastic_sheet, items.metal_block, items.plastic_sheet},
-      {items.transformer, items.transformer, items.transformer},
+      {adaptation.plastic_sheet.name, adaptation.metal_block.name, adaptation.plastic_sheet.name},
+      {adaptation.transformer.name, adaptation.transformer.name, adaptation.transformer.name},
     },
-    replacements = {{items.copper_wire,items.empty_spool}},
+    replacements = {{adaptation.copper_wire.name,adaptation.empty_spool.name}},
   })
 
 minetest.register_craft({
     output = "power_generators:power_meter",
     recipe = {
       {"power_generators:electric_cableS", "power_generators:electric_cableS", "power_generators:electric_cableS"},
-      {items.plastic_sheet, items.plastic_strip, items.plastic_sheet},
-      {items.transformer, items.metal_block, items.magnet},
+      {adaptation.plastic_sheet.name, adaptation.plastic_strip.name, adaptation.plastic_sheet.name},
+      {adaptation.transformer.name, adaptation.metal_block.name, adaptation.magnet.name},
     },
-    replacements = {{items.copper_wire,items.empty_spool}},
+    replacements = {{adaptation.copper_wire.name,adaptation.empty_spool.name}},
   })
 
 minetest.register_craft({
     output = "power_generators:charger",
     recipe = {
       {"power_generators:electric_cableS", "power_generators:electric_cableS", "power_generators:electric_cableS"},
-      {items.plastic_sheet, items.metal_block, items.plastic_sheet},
-      {items.transformer, items.controller, items.copper_wire},
+      {adaptation.plastic_sheet.name, adaptation.metal_block.name, adaptation.plastic_sheet.name},
+      {adaptation.transformer.name, adaptation.controller.name, adaptation.copper_wire.name},
     },
     replacements = {
-      {items.copper_wire,items.empty_spool},
-      {items.copper_wire,items.empty_spool},
+      {adaptation.copper_wire.name,adaptation.empty_spool.name},
+      {adaptation.copper_wire.name,adaptation.empty_spool.name},
     },
   })
 
 minetest.register_craft({
     output = "power_generators:combustion_engine_piston",
     recipe = {
-      {items.strong_ingot, items.strong_ingot, items.strong_ingot},
-      {"", items.strong_ingot, ""},
-      {"", items.strong_ingot, ""},
+      {adaptation.strong_ingot.name, adaptation.strong_ingot.name, adaptation.strong_ingot.name},
+      {"", adaptation.strong_ingot.name, ""},
+      {"", adaptation.strong_ingot.name, ""},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:combustion_engine_cylinder_body",
     recipe = {
-      {items.strong_ingot, "", items.strong_ingot},
-      {items.strong_ingot, "", items.strong_ingot},
-      {items.strong_ingot, items.strong_ingot, items.strong_ingot},
+      {adaptation.strong_ingot.name, "", adaptation.strong_ingot.name},
+      {adaptation.strong_ingot.name, "", adaptation.strong_ingot.name},
+      {adaptation.strong_ingot.name, adaptation.strong_ingot.name, adaptation.strong_ingot.name},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:combustion_engine_crankshaft 2",
     recipe = {
-      {"", items.strong_ingot, items.strong_ingot},
-      {"", items.strong_ingot, ""},
-      {items.strong_ingot, items.strong_ingot, ""},
+      {"", adaptation.strong_ingot.name, adaptation.strong_ingot.name},
+      {"", adaptation.strong_ingot.name, ""},
+      {adaptation.strong_ingot.name, adaptation.strong_ingot.name, ""},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:combustion_engine_spark_plug",
     recipe = {
-      {items.copper_ingot, items.copper_wire, items.copper_ingot},
-      {"", items.mese_fragment, ""},
+      {adaptation.copper_ingot.name, adaptation.copper_wire.name, adaptation.copper_ingot.name},
+      {"", adaptation.mese_fragment.name, ""},
     },
-    replacements = {{items.copper_wire,items.empty_spool}},
+    replacements = {{adaptation.copper_wire.name,adaptation.empty_spool.name}},
   })
 
 minetest.register_craft({
     output = "power_generators:combustion_engine_body_2",
     recipe = {
-      {"power_generators:combustion_engine_spark_plug", items.metal_ingot, "power_generators:combustion_engine_spark_plug"},
+      {"power_generators:combustion_engine_spark_plug", adaptation.metal_ingot.name, "power_generators:combustion_engine_spark_plug"},
       {"power_generators:combustion_engine_piston", "", "power_generators:combustion_engine_piston"},
       {"power_generators:combustion_engine_cylinder_body", "power_generators:combustion_engine_crankshaft", "power_generators:combustion_engine_cylinder_body"},
     }
@@ -178,8 +180,8 @@ minetest.register_craft({
 minetest.register_craft({
     output = "power_generators:combustion_engine_body_2_controlled",
     recipe = {
-      {"power_generators:combustion_engine_spark_plug", items.metal_ingot, "power_generators:combustion_engine_spark_plug"},
-      {"power_generators:combustion_engine_piston", items.controller, "power_generators:combustion_engine_piston"},
+      {"power_generators:combustion_engine_spark_plug", adaptation.metal_ingot.name, "power_generators:combustion_engine_spark_plug"},
+      {"power_generators:combustion_engine_piston", adaptation.controller.name, "power_generators:combustion_engine_piston"},
       {"power_generators:combustion_engine_cylinder_body", "power_generators:combustion_engine_crankshaft", "power_generators:combustion_engine_cylinder_body"},
     }
   })
@@ -187,7 +189,7 @@ minetest.register_craft({
 minetest.register_craft({
     output = "power_generators:combustion_engine_body_4",
     recipe = {
-      {items.metal_ingot, items.metal_ingot},
+      {adaptation.metal_ingot.name, adaptation.metal_ingot.name},
       {"power_generators:combustion_engine_body_2","power_generators:combustion_engine_body_2"},
       {"power_generators:combustion_engine_crankshaft","power_generators:combustion_engine_crankshaft"},
     }
@@ -196,7 +198,7 @@ minetest.register_craft({
 minetest.register_craft({
     output = "power_generators:combustion_engine_body_6",
     recipe = {
-      {items.metal_ingot, items.metal_ingot, items.metal_ingot},
+      {adaptation.metal_ingot.name, adaptation.metal_ingot.name, adaptation.metal_ingot.name},
       {"power_generators:combustion_engine_body_2","power_generators:combustion_engine_body_2", "power_generators:combustion_engine_body_2"},
       {"power_generators:combustion_engine_crankshaft","power_generators:combustion_engine_crankshaft","power_generators:combustion_engine_crankshaft"},
     }
@@ -207,7 +209,7 @@ minetest.register_craft({
 minetest.register_craft({
     output = "power_generators:combustion_engine_body_8",
     recipe = {
-      {items.metal_ingot, items.metal_ingot},
+      {adaptation.metal_ingot, adaptation.metal_ingot},
       {"power_generators:combustion_engine_body_4","power_generators:combustion_engine_body_4"},
       {"power_generators:combustion_engine_crankshaft","power_generators:combustion_engine_crankshaft"},
     }
@@ -217,107 +219,109 @@ minetest.register_craft({
 minetest.register_craft({
     output = "power_generators:combustion_engine_two_cylinders",
     recipe = {
-      {items.metal_ingot, "", items.metal_ingot},
-      {items.copper_wire, "power_generators:combustion_engine_body_2", items.copper_wire},
-      {items.metal_ingot, "power_generators:shaft", items.metal_ingot},
+      {adaptation.metal_ingot.name, "", adaptation.metal_ingot.name},
+      {adaptation.copper_wire.name, "power_generators:combustion_engine_body_2", adaptation.copper_wire.name},
+      {adaptation.metal_ingot.name, "power_generators:shaft", adaptation.metal_ingot.name},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:combustion_engine_two_cylinders_controlled",
     recipe = {
-      {items.metal_ingot, items.controller, items.metal_ingot},
-      {items.copper_wire, "power_generators:combustion_engine_body_2_controlled", items.copper_wire},
-      {items.metal_ingot, "power_generators:shaft", items.metal_ingot},
+      {adaptation.metal_ingot.name, adaptation.controller.name, adaptation.metal_ingot.name},
+      {adaptation.copper_wire.name, "power_generators:combustion_engine_body_2_controlled", adaptation.copper_wire.name},
+      {adaptation.metal_ingot.name, "power_generators:shaft", adaptation.metal_ingot.name},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:combustion_engine_six_cylinders",
     recipe = {
-      {items.metal_ingot, "", items.metal_ingot},
-      {items.copper_wire, "power_generators:combustion_engine_body_6", items.copper_wire},
-      {items.metal_ingot, "power_generators:shaft", items.metal_ingot},
+      {adaptation.metal_ingot.name, "", adaptation.metal_ingot.name},
+      {adaptation.copper_wire.name, "power_generators:combustion_engine_body_6", adaptation.copper_wire.name},
+      {adaptation.metal_ingot.name, "power_generators:shaft", adaptation.metal_ingot.name},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:combustion_engine_gearbox",
     recipe = {
-      {items.metal_ingot, items.gear, items.metal_ingot},
-      {items.metal_ingot, items.gear, items.metal_ingot},
-      {items.metal_ingot, items.gear, items.metal_ingot},
+      {adaptation.metal_ingot.name, adaptation.gear.name, adaptation.metal_ingot.name},
+      {adaptation.metal_ingot.name, adaptation.gear.name, adaptation.metal_ingot.name},
+      {adaptation.metal_ingot.name, adaptation.gear.name, adaptation.metal_ingot.name},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:combustion_engine_alternator",
     recipe = {
-      {"", items.transformer, ""},
-      {"", items.electric_motor, ""},
-      {items.metal_ingot, "", items.metal_ingot},
+      {"", adaptation.transformer.name, ""},
+      {"", adaptation.electric_motor.name, ""},
+      {adaptation.metal_ingot.name, "", adaptation.metal_ingot.name},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:combustion_engine_fuel_tank",
     recipe = {
-      {items.metal_ingot, items.metal_ingot, items.metal_ingot},
-      {items.metal_ingot, "", items.metal_ingot},
-      {items.metal_ingot, items.metal_ingot, items.metal_ingot},
+      {adaptation.metal_ingot.name, adaptation.metal_ingot.name, adaptation.metal_ingot.name},
+      {adaptation.metal_ingot.name, "", adaptation.metal_ingot.name},
+      {adaptation.metal_ingot.name, adaptation.metal_ingot.name, adaptation.metal_ingot.name},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:emergency_generator",
     recipe = {
-      {items.metal_ingot, "power_generators:combustion_engine_fuel_tank", items.metal_ingot},
+      {adaptation.metal_ingot.name, "power_generators:combustion_engine_fuel_tank", adaptation.metal_ingot.name},
       {"power_generators:combustion_engine_two_cylinders", "power_generators:combustion_engine_gearbox", "power_generators:combustion_engine_alternator"},
-      {items.metal_ingot, "", items.metal_ingot},
+      {adaptation.metal_ingot.name, "", adaptation.metal_ingot.name},
     },
   })
 
 minetest.register_craft({
     output = "power_generators:emergency_generator_2",
     recipe = {
-      {items.metal_ingot, "power_generators:combustion_engine_fuel_tank", items.metal_ingot},
+      {adaptation.metal_ingot.name, "power_generators:combustion_engine_fuel_tank", adaptation.metal_ingot.name},
       {"power_generators:combustion_engine_two_cylinders_controlled", "power_generators:combustion_engine_gearbox", "power_generators:combustion_engine_alternator"},
-      {items.metal_ingot, "", items.metal_ingot},
+      {adaptation.metal_ingot.name, "", adaptation.metal_ingot.name},
     },
   })
 
 minetest.register_craft({
     output = "power_generators:alternator",
     recipe = {
-      {"power_generators:framework",items.iron_ingot,"power_generators:electric_cableS"},
-      {items.iron_ingot,"power_generators:electric_engine_p24",items.iron_ingot},
-      {items.transformer,items.iron_ingot, items.transformer},
+      {"power_generators:framework",adaptation.iron_ingot.name,"power_generators:electric_cableS"},
+      {adaptation.iron_ingot.name,"power_generators:electric_engine_p24",adaptation.iron_ingot.name},
+      {adaptation.transformer.name,adaptation.iron_ingot.name, adaptation.transformer.name},
     }
   })
 
-minetest.register_craft({
-    output = "power_generators:fuel_hosepipe",
-    recipe = {
-      {"",items.rubber,""},
-      {items.rubber,"",items.rubber},
-      {"",items.rubber,""},
-    }
-  })
+if adaptation.rubber then
+  minetest.register_craft({
+      output = "power_generators:fuel_hosepipe",
+      recipe = {
+        {"",adaptation.rubber.name,""},
+        {adaptation.rubber.name,"",adaptation.rubber.name},
+        {"",adaptation.rubber.name,""},
+      }
+    })
 
-minetest.register_craft({
-    output = "power_generators:fuel_tank",
-    recipe = {
-      {"","power_generators:combustion_engine_fuel_tank",items.rubber},
-      {"power_generators:combustion_engine_fuel_tank","power_generators:framework","power_generators:combustion_engine_fuel_tank"},
-      {"","power_generators:combustion_engine_fuel_tank","power_generators:fuel_hosepipe"},
-    }
-  })
+  minetest.register_craft({
+      output = "power_generators:fuel_tank",
+      recipe = {
+        {"","power_generators:combustion_engine_fuel_tank",adaptation.rubber.name},
+        {"power_generators:combustion_engine_fuel_tank","power_generators:framework","power_generators:combustion_engine_fuel_tank"},
+        {"","power_generators:combustion_engine_fuel_tank","power_generators:fuel_hosepipe"},
+      }
+    })
+end
 
 minetest.register_craft({
     output = "power_generators:gearbox",
     recipe = {
-      {items.steel_strip,items.steel_strip,"power_generators:combustion_engine_gearbox"},
-      {items.steel_strip,"power_generators:framework","power_generators:shaft"},
+      {adaptation.steel_strip.name,adaptation.steel_strip.name,"power_generators:combustion_engine_gearbox"},
+      {adaptation.steel_strip.name,"power_generators:framework","power_generators:shaft"},
       {"power_generators:combustion_engine_gearbox","power_generators:shaft","power_generators:combustion_engine_gearbox"},
     }
   })
@@ -325,8 +329,8 @@ minetest.register_craft({
 minetest.register_craft({
     output = "power_generators:starter_manual",
     recipe = {
-      {items.steel_bar,items.steel_strip,items.steel_bar},
-      {items.steel_strip,"power_generators:framework","power_generators:shaft"},
+      {adaptation.steel_bar.name,adaptation.steel_strip.name,adaptation.steel_bar.name},
+      {adaptation.steel_strip.name,"power_generators:framework","power_generators:shaft"},
       {"power_generators:combustion_engine_gearbox","power_generators:shaft","power_generators:combustion_engine_gearbox"},
     }
   })
@@ -335,7 +339,7 @@ minetest.register_craft({
     output = "power_generators:combustion_engine_6c",
     recipe = {
       {"power_generators:framework","power_generators:fuel_hosepipe"},
-      {items.steel_strip,items.valve},
+      {adaptation.steel_strip.name,adaptation.valve.name},
       {"power_generators:shaft","power_generators:combustion_engine_six_cylinders"},
     }
   })
@@ -345,7 +349,7 @@ minetest.register_craft({
     output = "power_generators:combustion_engine_8c",
     recipe = {
       {"power_generators:framework","power_generators:fuel_hosepipe"},
-      {items.steel_strip,items.steel_strip},
+      {adaptation.steel_strip,adaptation.steel_strip},
       {"power_generators:shaft","power_generators:combustion_engine_eight_cylinders"},
     }
   })
@@ -354,29 +358,18 @@ minetest.register_craft({
 minetest.register_craft({
     output = "power_generators:shaft 3",
     recipe = {
-      {items.strong_ingot,},
-      {items.strong_ingot,},
-      {items.strong_ingot,},
+      {adaptation.strong_ingot.name,},
+      {adaptation.strong_ingot.name,},
+      {adaptation.strong_ingot.name,},
     }
   })
-
-if minetest.get_modpath("technic") or minetest.get_modpath("hades_technic") then
-  minetest.register_craft({
-      output = "power_generators:carbon_steel_bar 6",
-      recipe = {
-        {"","",items.metal_ingot},
-        {"",items.metal_ingot,""},
-        {items.metal_ingot,"",""},
-      }
-    })
-end
 
 minetest.register_craft({
     output = "power_generators:framework_base",
     recipe = {
-      {"",items.steel_bar,""},
-      {items.steel_bar,"", items.steel_bar},
-      {"",items.steel_bar,""},
+      {"",adaptation.steel_bar.name,""},
+      {adaptation.steel_bar.name,"", adaptation.steel_bar.name},
+      {"",adaptation.steel_bar.name,""},
     }
   })
 
@@ -384,126 +377,126 @@ minetest.register_craft({
     type = "shapeless",
     output = "power_generators:framework",
     recipe = {
-      items.steel_bar,
-      items.steel_bar,
-      items.steel_bar,
-      items.steel_bar,
+      adaptation.steel_bar.name,
+      adaptation.steel_bar.name,
+      adaptation.steel_bar.name,
+      adaptation.steel_bar.name,
       "power_generators:framework_base",
       "power_generators:framework_base",
-      items.steel_bar,
+      adaptation.steel_bar.name,
     }
   })
 
 minetest.register_craft({
     output = "power_generators:block_of_3coils",
     recipe = {
-      {items.copper_wire,items.copper_wire,items.copper_wire},
-      {items.plastic_strip,items.plastic_strip,items.plastic_strip},
+      {adaptation.copper_wire.name,adaptation.copper_wire.name,adaptation.copper_wire.name},
+      {adaptation.plastic_strip.name,adaptation.plastic_strip.name,adaptation.plastic_strip.name},
     },
     replacements = {
-      {items.copper_wire,items.empty_spool},
-      {items.copper_wire,items.empty_spool},
-      {items.copper_wire,items.empty_spool}},
+      {adaptation.copper_wire.name,adaptation.empty_spool.name},
+      {adaptation.copper_wire.name,adaptation.empty_spool.name},
+      {adaptation.copper_wire.name,adaptation.empty_spool.name}},
   })
 
 minetest.register_craft({
     output = "power_generators:block_of_3magnets",
     recipe = {
-      {items.magnet,items.magnet,items.magnet},
-      {items.plastic_strip,items.plastic_strip,items.plastic_strip},
+      {adaptation.magnet.name,adaptation.magnet.name,adaptation.magnet.name},
+      {adaptation.plastic_strip.name,adaptation.plastic_strip.name,adaptation.plastic_strip.name},
     },
   })
 
 minetest.register_craft({
     output = "power_generators:electric_engine_p6",
     recipe = {
-      {items.steel_strip,"power_generators:block_of_3coils",items.steel_strip},
+      {adaptation.steel_strip.name,"power_generators:block_of_3coils",adaptation.steel_strip.name},
       {"power_generators:block_of_3magnets","power_generators:shaft", "power_generators:block_of_3magnets"},
-      {items.steel_strip,"power_generators:block_of_3coils",items.steel_strip},
+      {adaptation.steel_strip.name,"power_generators:block_of_3coils",adaptation.steel_strip.name},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:block_of_6coils",
     recipe = {
-      {items.copper_wire,items.copper_wire,items.copper_wire},
-      {items.plastic_strip,items.plastic_strip,items.plastic_strip},
-      {items.copper_wire,items.copper_wire,items.copper_wire},
+      {adaptation.copper_wire.name,adaptation.copper_wire.name,adaptation.copper_wire.name},
+      {adaptation.plastic_strip.name,adaptation.plastic_strip.name,adaptation.plastic_strip.name},
+      {adaptation.copper_wire.name,adaptation.copper_wire.name,adaptation.copper_wire.name},
     },
     replacements = {
-      {items.copper_wire,items.empty_spool},
-      {items.copper_wire,items.empty_spool},
-      {items.copper_wire,items.empty_spool},
-      {items.copper_wire,items.empty_spool},
-      {items.copper_wire,items.empty_spool},
-      {items.copper_wire,items.empty_spool}},
+      {adaptation.copper_wire.name,adaptation.empty_spool.name},
+      {adaptation.copper_wire.name,adaptation.empty_spool.name},
+      {adaptation.copper_wire.name,adaptation.empty_spool.name},
+      {adaptation.copper_wire.name,adaptation.empty_spool.name},
+      {adaptation.copper_wire.name,adaptation.empty_spool.name},
+      {adaptation.copper_wire.name,adaptation.empty_spool.name}},
   })
 
 minetest.register_craft({
     output = "power_generators:block_of_6magnets",
     recipe = {
-      {items.magnet,items.magnet,items.magnet},
-      {items.plastic_strip,items.plastic_strip,items.plastic_strip},
-      {items.magnet,items.magnet,items.magnet},
+      {adaptation.magnet.name,adaptation.magnet.name,adaptation.magnet.name},
+      {adaptation.plastic_strip.name,adaptation.plastic_strip.name,adaptation.plastic_strip.name},
+      {adaptation.magnet.name,adaptation.magnet.name,adaptation.magnet.name},
     },
   })
 
 minetest.register_craft({
     output = "power_generators:electric_engine_p12",
     recipe = {
-      {items.steel_strip,"power_generators:block_of_6coils",items.steel_strip},
+      {adaptation.steel_strip.name,"power_generators:block_of_6coils",adaptation.steel_strip.name},
       {"power_generators:block_of_6magnets","power_generators:shaft", "power_generators:block_of_6magnets"},
-      {items.steel_strip,"power_generators:block_of_6coils",items.steel_strip},
+      {adaptation.steel_strip.name,"power_generators:block_of_6coils",adaptation.steel_strip.name},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:block_of_12coils",
     recipe = {
-      {"power_generators:block_of_6coils",items.plastic_strip,"power_generators:block_of_6coils"},
+      {"power_generators:block_of_6coils",adaptation.plastic_strip.name,"power_generators:block_of_6coils"},
     },
   })
 
 minetest.register_craft({
     output = "power_generators:block_of_12magnets",
     recipe = {
-      {"power_generators:block_of_6magnets",items.plastic_strip,"power_generators:block_of_6magnets"},
+      {"power_generators:block_of_6magnets",adaptation.plastic_strip.name,"power_generators:block_of_6magnets"},
     },
   })
 
 minetest.register_craft({
     output = "power_generators:electric_engine_p24",
     recipe = {
-      {items.steel_strip,"power_generators:block_of_12coils",items.steel_strip},
+      {adaptation.steel_strip.name,"power_generators:block_of_12coils",adaptation.steel_strip.name},
       {"power_generators:block_of_12magnets","power_generators:shaft", "power_generators:block_of_12magnets"},
-      {items.steel_strip,"power_generators:block_of_12coils",items.steel_strip},
+      {adaptation.steel_strip.name,"power_generators:block_of_12coils",adaptation.steel_strip.name},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:electric_engine_200",
     recipe = {
-      {"power_generators:framework",items.iron_ingot,"power_generators:electric_cableS"},
-      {items.iron_ingot,"power_generators:electric_engine_p6",items.iron_ingot},
-      {"",items.iron_ingot,""},
+      {"power_generators:framework",adaptation.iron_ingot.name,"power_generators:electric_cableS"},
+      {adaptation.iron_ingot.name,"power_generators:electric_engine_p6",adaptation.iron_ingot.name},
+      {"",adaptation.iron_ingot.name,""},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:electric_engine_400",
     recipe = {
-      {"power_generators:framework",items.iron_ingot,"power_generators:electric_cableS"},
-      {items.iron_ingot,"power_generators:electric_engine_p12",items.iron_ingot},
-      {"",items.iron_ingot,""},
+      {"power_generators:framework",adaptation.iron_ingot.name,"power_generators:electric_cableS"},
+      {adaptation.iron_ingot.name,"power_generators:electric_engine_p12",adaptation.iron_ingot.name},
+      {"",adaptation.iron_ingot.name,""},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:electric_engine_800",
     recipe = {
-      {"power_generators:framework",items.iron_ingot,"power_generators:electric_cableS"},
-      {items.iron_ingot,"power_generators:electric_engine_p24",items.iron_ingot},
-      {"",items.iron_ingot,""},
+      {"power_generators:framework",adaptation.iron_ingot.name,"power_generators:electric_cableS"},
+      {adaptation.iron_ingot.name,"power_generators:electric_engine_p24",adaptation.iron_ingot.name},
+      {"",adaptation.iron_ingot.name,""},
     }
   })
 
@@ -524,63 +517,63 @@ minetest.register_craft({
 minetest.register_craft({
     output = "power_generators:shaft_horLeft",
     recipe = {
-      {"power_generators:framework",items.iron_ingot,"power_generators:shaft"},
-      {items.iron_ingot,"power_generators:shaft",items.iron_ingot},
-      {items.gear,items.iron_ingot,items.gear},
+      {"power_generators:framework",adaptation.iron_ingot.name,"power_generators:shaft"},
+      {adaptation.iron_ingot.name,"power_generators:shaft",adaptation.iron_ingot.name},
+      {adaptation.gear.name,adaptation.iron_ingot.name,adaptation.gear.name},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:shaft_horTop",
     recipe = {
-      {"power_generators:framework",items.iron_ingot,items.gear},
-      {items.iron_ingot,"power_generators:shaft",items.iron_ingot},
-      {items.gear,items.iron_ingot,"power_generators:shaft"},
+      {"power_generators:framework",adaptation.iron_ingot.name,adaptation.gear.name},
+      {adaptation.iron_ingot.name,"power_generators:shaft",adaptation.iron_ingot.name},
+      {adaptation.gear.name,adaptation.iron_ingot.name,"power_generators:shaft"},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:shaft_verFront",
     recipe = {
-      {items.gear,items.iron_ingot,"power_generators:shaft"},
-      {items.iron_ingot,"power_generators:shaft",items.iron_ingot},
-      {"power_generators:framework",items.iron_ingot,items.gear},
+      {adaptation.gear.name,adaptation.iron_ingot.name,"power_generators:shaft"},
+      {adaptation.iron_ingot.name,"power_generators:shaft",adaptation.iron_ingot.name},
+      {"power_generators:framework",adaptation.iron_ingot.name,adaptation.gear.name},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:shaft_switch",
     recipe = {
-      {"power_generators:framework",items.iron_ingot,items.steel_bar},
-      {items.iron_ingot,"power_generators:shaft",items.iron_ingot},
-      {items.gear,items.iron_ingot,items.gear},
+      {"power_generators:framework",adaptation.iron_ingot.name,adaptation.steel_bar.name},
+      {adaptation.iron_ingot.name,"power_generators:shaft",adaptation.iron_ingot.name},
+      {adaptation.gear.name,adaptation.iron_ingot.name,adaptation.gear.name},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:shaft_gearbox",
     recipe = {
-      {"power_generators:framework",items.iron_ingot,items.gear},
-      {items.iron_ingot,"power_generators:shaft",items.iron_ingot},
-      {items.gear,items.iron_ingot,items.gear},
+      {"power_generators:framework",adaptation.iron_ingot.name,adaptation.gear.name},
+      {adaptation.iron_ingot.name,"power_generators:shaft",adaptation.iron_ingot.name},
+      {adaptation.gear.name,adaptation.iron_ingot.name,adaptation.gear.name},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:rpm_meter",
     recipe = {
-      {"power_generators:framework",items.controller,"power_generators:electric_cableS"},
-      {items.glow_crystal,"",items.mese_fragment},
-      {items.iron_ingot,"power_generators:shaft",items.iron_ingot},
+      {"power_generators:framework",adaptation.controller.name,"power_generators:electric_cableS"},
+      {adaptation.glow_crystal.name,"",adaptation.mese_fragment.name},
+      {adaptation.iron_ingot.name,"power_generators:shaft",adaptation.iron_ingot.name},
     }
   })
 
 minetest.register_craft({
     output = "power_generators:rpm_meter_watt",
     recipe = {
-      {items.steel_bar,"",items.steel_bar},
-      {items.string,"power_generators:shaft",items.plastic_sheet},
-      {items.steel_bar,"",items.steel_bar},
+      {adaptation.steel_bar.name,"",adaptation.steel_bar.name},
+      {adaptation.string.name,"power_generators:shaft",adaptation.plastic_sheet.name},
+      {adaptation.steel_bar.name,"",adaptation.steel_bar.name},
     }
   })
 
