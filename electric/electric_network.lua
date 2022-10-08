@@ -1,5 +1,7 @@
 local S = power_generators.translator;
 
+local adaptation = power_generators.adaptation
+
 -- for lazy programmers
 --local S2P = minetest.string_to_pos
 --local P2S = minetest.pos_to_string
@@ -79,7 +81,7 @@ minetest.register_node("power_generators:electric_cableS", {
   after_dig_node = function(pos, oldnode, oldmetadata)
     Cable:after_dig_tube(pos, oldnode, oldmetadata)
   end,
-  on_rotate = screwdriver.disallow, -- important!
+  on_rotate = adaptation.screwdriver_mod.disallow, -- important!
   on_blast = gen_on_blast("power_generators:electric_cableS"),
 })
 
@@ -116,7 +118,7 @@ minetest.register_node("power_generators:electric_cableA", {
   after_dig_node = function(pos, oldnode)
     Cable:after_dig_tube(pos, oldnode)
   end,
-  on_rotate = screwdriver.disallow, -- important!
+  on_rotate = adaptation.screwdriver_mod.disallow, -- important!
   on_blast = gen_on_blast("power_generators:electric_cableS"),
 })
 

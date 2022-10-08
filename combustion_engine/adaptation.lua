@@ -35,3 +35,4 @@ if minetest.get_modpath("hades_biofuel") then
       _fuel_empty = "hades_biofuel:can",
     })
 end
+

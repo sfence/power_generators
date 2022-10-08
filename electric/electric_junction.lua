@@ -1,6 +1,8 @@
 
 local S = power_generators.translator;
 
+local adaptation = power_generators.adaptation
+
 local Cable = power_generators.electric_cable
 
 local tubelib2_side = {
@@ -62,7 +64,7 @@ minetest.register_node("power_generators:junction_box", {
   tubelib2_on_update2 = function()
     print("tubelib2_on_update2 junction")
   end,
-  on_rotate = screwdriver.disallow, -- important!
+  on_rotate = adaptation.screwdriver_mod.disallow, -- important!
   on_blast = gen_on_blast("power_generators:junction_box"),
   
   on_construct = function(pos)
