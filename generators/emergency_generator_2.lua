@@ -74,11 +74,6 @@ emergency_generator:control_data_register(
 -- Formspec --
 --------------
 
-local player_inv = "list[current_player;main;1.5,3.5;8,4;]";
-if minetest.get_modpath("hades_core") then
-   player_inv = "list[current_player;main;0.5,3.5;10,4;]";
-end
-
 --function emergency_generator:get_formspec(meta, production_percent, consumption_percent)
 function emergency_generator:get_formspec(_, _, consumption_percent)
   local progress = "image[3.6,0.9;5.5,0.95;appliances_consumption_progress_bar.png^[transformR270]]";
@@ -90,12 +85,12 @@ function emergency_generator:get_formspec(_, _, consumption_percent)
   
   
   
-  local formspec =  "formspec_version[3]" .. "size[12.75,8.5]" ..
+  local formspec =  "size[12.75,8.5]" ..
                     "background[-1.25,-1.25;15,10;appliances_appliance_formspec.png]" ..
                     progress..
-                    player_inv ..
-                    "list[context;"..self.use_stack..";2,0.8;1,1;]"..
-                    "list[context;"..self.output_stack..";9.75,0.25;2,2;]" ..
+                    self:get_player_inv() ..
+                    self:get_formspec_list("context", self.use_stack, 2, 0.8, 1, 1)..
+                    self:get_formspec_list("context", self.output_stack, 9.75, 0.25, 2, 2)..
                     "listring[current_player;main]" ..
                     "listring[context;"..self.use_stack.."]" ..
                     "listring[current_player;main]" ..

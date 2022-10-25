@@ -73,16 +73,11 @@ charger.node_help = S("Connect to power (@1).", charger:get_power_help()).."\n".
 --------------
 
 -- form spec
-local player_inv = "list[current_player;main;1.5,3;8,4;]";
-if minetest.get_modpath("hades_core") then
-  player_inv = "list[current_player;main;0.5,3;10,4;]";
-end
-
 function charger:get_formspec()
-  local formspec =  "formspec_version[3]" .. "size[12.75,8.5]" ..
+  local formspec =  "size[12.75,8.5]" ..
                     "background[-1.25,-1.25;15,10;appliances_appliance_formspec.png]" ..
-                    player_inv ..
-                    "list[context;"..self.output_stack..";4.75,1.0;1,1;]" ..
+                    self:get_player_inv() ..
+                    self:get_formspec_list("context", self.output_stack, 4.75,1,1,1)..
                     "listring[current_player;main]" ..
                     "listring[context;"..self.output_stack.."]" ..
                     "listring[current_player;main]";
@@ -123,10 +118,12 @@ function charger:cb_on_production(timer_step)
   -- charge
   local stack = timer_step.inv:get_stack(self.output_stack, 1)
   local def = stack:get_definition()
-  local charge, max_charge = def._PG_batt_get_charge(stack)
-  charge = math.min(charge+200*timer_step.speed, max_charge)
-  def._PG_batt_set_charge(stack, charge)
-  timer_step.inv:set_stack(self.output_stack, 1, stack)
+  if def._PG_batt_get_charge then
+    local charge, max_charge = def._PG_batt_get_charge(stack)
+    charge = math.min(charge+200*timer_step.speed, max_charge)
+    def._PG_batt_set_charge(stack, charge)
+    timer_step.inv:set_stack(self.output_stack, 1, stack)
+  end
 end
 
 ----------

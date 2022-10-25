@@ -69,21 +69,16 @@ shaft_gearbox:power_data_register(
 -- Formspec --
 --------------
 
-local player_inv = "list[current_player;main;1.5,3.5;8,4;]";
-if minetest.get_modpath("hades_core") then
-   player_inv = "list[current_player;main;0.5,3.5;10,4;]";
-end
-
 function shaft_gearbox:get_formspec(meta)
   local inv = meta:get_inventory()
   local cnt1 = inv:get_stack(self.input_stack, 1):get_count()
   local cnt2 = inv:get_stack(self.input_stack, 2):get_count()
   local ratio = (cnt1+1).." : "..(cnt2+1)
-  local formspec =  "formspec_version[3]" .. "size[12.75,8.5]" ..
+  local formspec =  "size[12.75,8.5]" ..
                     "background[-1.25,-1.25;15,10;appliances_appliance_formspec.png]" ..
-                    player_inv ..
-                    "list[context;"..self.input_stack..";2,0.8;1,1;0]"..
-                    "list[context;"..self.input_stack..";9,0.8;1,1;1]"..
+                    self:get_player_inv() ..
+                    self:get_formspec_list("context", self.input_stack, 2, 0.8, 1, 1, 0)..
+                    self:get_formspec_list("context", self.input_stack, 9, 0.8, 1, 1, 1)..
                     "label[5.5,1.5;"..ratio.."]" ..
                     "listring[current_player;main]" ..
                     "listring[context;"..self.input_stack.."]" ..
