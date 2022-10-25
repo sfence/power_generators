@@ -275,8 +275,10 @@ minetest.register_globalstep(function(dtime)
                 local formspec = player:get_inventory_formspec()
                 if formspec~="" then
                   -- fix inventory disable
-                  players[player_name].formspec = formspec
-                  player:set_inventory_formspec("")
+                  if players[player_name] then
+                    players[player_name].formspec = formspec
+                    player:set_inventory_formspec("")
+                  end
                 end
                 -- only one running power tool in inventory
                 break
