@@ -8,7 +8,7 @@ adaptation_lib.check_keys_aviable("[power_generators] Crafting: ", adaptation, {
 minetest.register_craft({
     output = "power_generators:electric_cableS 6",
     recipe = {
-      {N(adaptation.plastic_sheet), N(adaptation.dye_yellow.name), ""},
+      {N(adaptation.plastic_sheet), N(adaptation.dye_yellow), ""},
       {"", N(adaptation.copper_wire), ""},
       {"", "", N(adaptation.plastic_sheet)},
     },
