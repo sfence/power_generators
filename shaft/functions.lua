@@ -100,7 +100,7 @@ local function default_find_side_shafts(shafts, need_rpm_update, top_data, side_
       else
         --Tpwr = Tpwr + o_T*ratio
         if top_data.rpmPwr>0 then
-          top_data.rpmPwr = math.min(rpmPwr, o_rpm/ratio)
+          top_data.rpmPwr = math.min(top_data.rpmPwr, o_rpm/ratio)
         else
           top_data.rpmPwr = o_rpm/ratio
         end

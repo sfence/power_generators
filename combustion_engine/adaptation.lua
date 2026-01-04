@@ -16,6 +16,19 @@ if minetest.get_modpath("biofuel") then
         _fuel_energy = 1.0,
         _fuel_empty = "biofuel:can",
       })
+	else
+    minetest.override_item("biofuel:phial_fuel", {
+        _fuel_amount = 1,
+        _fuel_energy = 1.0,
+      })
+    minetest.override_item("biofuel:bottle_fuel", {
+        _fuel_amount = 8,
+        _fuel_energy = 1.0,
+      })
+    minetest.override_item("biofuel:fuel_can", {
+        _fuel_amount = 64,
+        _fuel_energy = 1.0,
+      })
   end
 end
 if minetest.get_modpath("hades_biofuel") then
